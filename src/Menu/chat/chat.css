@@ -1,47 +1,42 @@
-.chatWindow {
+.chat-container {
+    border-radius: 5px;
     position: absolute;
+    display: flex;
+    flex-direction: column;
     width: 40ch;
     height: 50ch;
-    margin: 70px auto;
+    margin-bottom: 50px;
     padding: 10px;
     background: white;
-    border-radius: 3ch;
-    box-shadow: 0 0 30px #eee;
-    font-size: 17px;
     left: 5ch;
     bottom: 10ch;
-    overflow-y: scroll;
 }
 
-.input {
-    /* position: absolute; */
-    width: 38ch;
-    border-radius: 3ch;
-    padding: 10px;
-    /* bottom: 1ch; */
-    /* left: auto; */
+.message-input {
+    height: 50px;
+    width: 40ch;
+    margin-right: 10px;
+    font-size: 15px;
 }
 
-.send {
-    /* position: absolute; */
+.sendBtn {
+    height: 50px;
+    width: 50px;
     background-position: center;
     background-image: url(/public/send.png);
-    background-color: rgb(255, 175, 3);
+    background-color: rgb(255, 142, 37);
     background-repeat: no-repeat;
     background-size: 80%;
-    padding: 2ch 2ch;
-    border-radius: 10ch;
-    /* cursor: pointer; */
+    padding: 1ch 1ch;
+    cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    /* right: 2ch; */
-    bottom: 1ch;
-    font-size: 1em;
-    height: 4.6ch;
+    border-radius: 5px;
+    border: none;
 }
 
-.send:active {
+.sendBtn:active {
     background-color:rgb(182, 124, 0);
 }
 
@@ -51,9 +46,6 @@
     height: auto;
     padding: 2px;
     margin-bottom: 0.5ch;
-    border-radius: 1.5ch;
-    border-width: 3px;
-    border-style: solid;
     display: flex;
     flex-direction: column;
     background-color: rgba(0, 0, 0, 0.199);
@@ -71,15 +63,14 @@
     margin: 0 0 0 1ch;
 }
 
-.i {
+.chat-input {
+    height: 50px;
+    margin-top: 5px;
     display: flex;
-    position: fixed;
-    height: 5%;
-    width: 100%;
-    flex-direction: row;
+    align-items: center;
 }
 
-.mesh{
-    position: relative;
-    height: 90%;
+.messages-field{
+    height: 450px;
+    overflow-y: scroll;
 }
