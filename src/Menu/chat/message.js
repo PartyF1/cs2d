@@ -5,7 +5,7 @@ export default function Message(props) {
     return (
         <div className="message">
             <div className="name">
-                {message.name}
+                {message.userName}
             </div>
             <div className="text">
                 {message.message}

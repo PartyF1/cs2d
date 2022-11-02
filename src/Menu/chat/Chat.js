@@ -3,6 +3,7 @@ import Message from "./message.js"
 import "./chat.css"
 
 let messages = [];
+let hash;
 
 export default function Chat(props) {
    
@@ -18,7 +19,11 @@ export default function Chat(props) {
    })
 
    async function getMessages() {
-      messages = await server.getMessages();
+      const mesData = await server.getMessages(hash);
+      if (mesData) {
+         messages = mesData.messages;
+         hash = mesData.hash;
+      }
       setState(!state);
    }
    

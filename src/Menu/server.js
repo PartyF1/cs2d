@@ -3,7 +3,7 @@ export default class Server {
     const query = Object.keys(params)
       .map((key) => `${key}=${params[key]}`)
       .join('&');
-    const result = await fetch(`http://cs2d/api/?${query}`);
+    const result = await fetch(`http://cs2d?${query}`);
     const answer = await result.json();
     return answer.result === 'ok' ? answer.data : null;
   }
@@ -18,8 +18,8 @@ export default class Server {
     return null;
   }
 
-  async registration(login, password, name) {
-    return await this.send({method: "registration", login, password, name})
+  async registration(login, password, userName) {
+    return await this.send({method: 'registration', login, password, userName})
   }
 
   async logout() {
@@ -28,11 +28,16 @@ export default class Server {
     }
   }
 
-  async getMessages() {
-    return await this.send({ method: 'getMessages' });
-  }
+  async getMessages(hash){
+    return await this.send({method: 'getMessages', hash});
+  } 
 
   async sendMessage(name, message) {
-    return await this.send({ method: 'sendMessage', name, message });
+    return await this.send({ method: 'sendMessage', name, message, token: this.token });
   }
+
+  async getUserByLogin(login) {
+        const data = await this.send({method : 'getUserByLogin', login});
+        return data;
+}
 }

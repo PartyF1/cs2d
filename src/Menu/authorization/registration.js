@@ -46,6 +46,7 @@ export default function Registration(props) {
           className="form-input"
           ref={newPass}
           placeholder={'password'}
+          type= "password"
         ></input>
       </div>
 
@@ -55,6 +56,7 @@ export default function Registration(props) {
           className="form-input"
           ref={repeatPass}
           placeholder={'password'}
+          type= "password"
         ></input>
       </div>
 
