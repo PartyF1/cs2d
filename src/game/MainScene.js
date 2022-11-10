@@ -6,6 +6,7 @@ import Weapon from "./entities/weapons/weapon.js";
 
 
 
+
 export default class MainScene extends Phaser.Scene {
    constructor(server) {
       super("mainScene");
@@ -14,6 +15,7 @@ export default class MainScene extends Phaser.Scene {
 
       this.bullets = [];
       this.weapons = [];
+
 
       this.centWidth = window.outerWidth / 2;
       this.centHeight = window.outerHeight / 2;
@@ -55,9 +57,7 @@ export default class MainScene extends Phaser.Scene {
       );
 
       this.mouse = this.input.mousePointer;
-
-
-
+      
       this.anims.create({
          key: 'run',
          frames: this.anims.generateFrameNumbers("anim", { start: 0, end: 10 }),
@@ -71,8 +71,6 @@ export default class MainScene extends Phaser.Scene {
          frameRate: 30,
          repeat: -1
       });
-
-
       this.player = this.physics.add.existing(new Player(this, this.centWidth, this.centHeight, this.coursor, this.mouse, "girl", this.bullets))
 
       this.physics.add.collider(this.player, this.platform);
@@ -83,7 +81,6 @@ export default class MainScene extends Phaser.Scene {
       })
 
       this.camera = this.cameras.main.startFollow(this.player);
-
    }
 
 
@@ -115,6 +112,7 @@ export default class MainScene extends Phaser.Scene {
    //регистрация выстрела для всех указанного игрока
    fire(player) {
       if (player.mouse.leftButtonDown() && player.haveWeapon && player.canFire) {
+
          const bullet = this.physics.add.existing(new Bullet(this, player, this.mouse))
          this.physics.add.collider(bullet, this.platform);
          this.physics.add.collider(bullet, this.ground);
@@ -149,6 +147,7 @@ export default class MainScene extends Phaser.Scene {
       this.weapons.forEach((weapon, index) => {
          this.takeGun(weapon, index, this.player);
       })
+
    }
 
    update() {
@@ -157,5 +156,6 @@ export default class MainScene extends Phaser.Scene {
       this.takeGuns();
       this.fire(this.player);
       this.allBulletsTraectory(this.bullets);
+
    }
 }

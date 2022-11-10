@@ -1,7 +1,10 @@
 import Phaser from "phaser";
 
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, coursor, mouse, character, bullets) {
+=======
+
         super(scene, x, y, character);
         this.setScale(2, 2);
         this.scene.add.existing(this);
@@ -11,11 +14,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         //---------------------
         this.canJump = true;
         this.bullets = bullets;
+
         this.canFire = true;
         this.haveWeapon = false;
         this.vector = null;
         this.weapon = null;
         this.action = 2;
+
     }
 
     //одиночный прыжок
@@ -39,7 +44,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.vector = this.getVector();
         this.flipX = this.mouse.worldX < this.body.center.x ? true : false;   
     }
-
     //Прыжки
     jumping() {
         if (this.coursor.up.isDown) {
@@ -85,6 +89,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.weapon.rotation = Math.atan2(this.vector.y, this.vector.x);
             this.weapon.setPosition(this.body.center.x + this.vector.x, this.body.center.y + this.vector.y + 5)
             this.weapon.flipY = this.flipX? true : false;
+
         }
     }
 
@@ -92,6 +97,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update() {
         this.movement();
         this.jumping();
+
         this.gunMove();
         this.view();
         this.actionCheck()
