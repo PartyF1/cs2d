@@ -1,8 +1,10 @@
 import Phaser from "phaser";
-import Bullet from "./bullet";
+
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, coursor, mouse, character, bullets, weapon = {bulletSpeed : 500}) {
+    constructor(scene, x, y, coursor, mouse, character, bullets) {
+=======
+
         super(scene, x, y, character);
         this.setScale(2, 2);
         this.scene.add.existing(this);
@@ -12,9 +14,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         //---------------------
         this.canJump = true;
         this.bullets = bullets;
-        this.weapon = weapon;
+
         this.canFire = true;
         this.haveWeapon = false;
+        this.vector = null;
+        this.weapon = null;
+        this.action = 2;
+
     }
 
     //одиночный прыжок
@@ -25,6 +31,19 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    actionCheck() {
+        if (this.coursor.action.isDown && this.action > 0) this.action--;
+        else if (this.coursor.action.isUp) this.action = 2;
+    }
+    
+    getVector() {
+        return new Phaser.Math.Vector2(this.mouse.worldX - this.body.center.x, this.mouse.worldY - this.body.center.y);
+    };
+
+    view() {
+        this.vector = this.getVector();
+        this.flipX = this.mouse.worldX < this.body.center.x ? true : false;   
+    }
     //Прыжки
     jumping() {
         if (this.coursor.up.isDown) {
@@ -49,7 +68,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     //функция изменения координат персонажа и проигрывание соответствующей анимации
     run(direction = 1, speed = 160) {
         this.setVelocityX(direction * speed);
-        this.flipX = direction !== 1;
         this.anims.play("run", true);
     }
 
@@ -65,13 +83,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    //Взятие игроком оружия
-    takeGun(gun) {
-        if (this.body.hitTest(gun.x, gun.y) && this.coursor.action.isDown) {
-            this.weapon = gun;
-            this.canFire = true;
-            this.haveWeapon = true;
-            gun.destroy()
+    gunMove() {
+        if (this.weapon) {
+            this.vector.setLength(22);
+            this.weapon.rotation = Math.atan2(this.vector.y, this.vector.x);
+            this.weapon.setPosition(this.body.center.x + this.vector.x, this.body.center.y + this.vector.y + 5)
+            this.weapon.flipY = this.flipX? true : false;
+
         }
     }
 
@@ -79,5 +97,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update() {
         this.movement();
         this.jumping();
+
+        this.gunMove();
+        this.view();
+        this.actionCheck()
     }
 }

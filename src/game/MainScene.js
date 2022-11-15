@@ -1,14 +1,21 @@
 import Phaser from "phaser";
 import Bullet from "./entities/bullet.js";
 import Player from "./entities/player.js"
+import Pistol from "./entities/weapons/pistol.js";
+import Weapon from "./entities/weapons/weapon.js";
+
 
 
 
 export default class MainScene extends Phaser.Scene {
-   constructor() {
+   constructor(server) {
       super("mainScene");
 
+      this.server = server;
+
       this.bullets = [];
+      this.weapons = [];
+
 
       this.centWidth = window.outerWidth / 2;
       this.centHeight = window.outerHeight / 2;
@@ -20,14 +27,18 @@ export default class MainScene extends Phaser.Scene {
       this.load.image("platform", 'assets/platform.png');
       this.load.spritesheet("girl", "assets/New Piskel-3.png.png", { frameWidth: 32, frameHeight: 32 })
       this.load.spritesheet("anim", "assets/New Piskel (1).png", { frameWidth: 32, frameHeight: 32 });
-      this.load.image("gun", "assets/deagle.png");
+      this.load.image("pistol", "assets/deagle.png");
       this.load.image("bullet", "assets/bullet.png");
+      this.load.audio("pistolShot", "audio/sound/pistol.mp3");
    }
 
    create() {
       this.bg = this.add.tileSprite(this.centWidth, this.centHeight, 4000, 2250, "city").setScale(this.centWidth / 2000, this.centHeight / 1125);
 
-      this.gun = this.physics.add.sprite(this.centWidth, this.centHeight, "gun").setScale(0.03);
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.centWidth, this.centHeight)))
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.centWidth + 100, this.centHeight)))
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.centWidth - 100, this.centHeight)))
+
 
       this.ground = this.physics.add.staticGroup()
       this.ground.create(this.centWidth, this.centHeight + 300, "ground");
@@ -46,7 +57,7 @@ export default class MainScene extends Phaser.Scene {
       );
 
       this.mouse = this.input.mousePointer;
-
+      
       this.anims.create({
          key: 'run',
          frames: this.anims.generateFrameNumbers("anim", { start: 0, end: 10 }),
@@ -60,13 +71,14 @@ export default class MainScene extends Phaser.Scene {
          frameRate: 30,
          repeat: -1
       });
-
       this.player = this.physics.add.existing(new Player(this, this.centWidth, this.centHeight, this.coursor, this.mouse, "girl", this.bullets))
 
       this.physics.add.collider(this.player, this.platform);
       this.physics.add.collider(this.player, this.ground);
-      this.physics.add.collider(this.gun, this.platform);
-      this.physics.add.collider(this.gun, this.ground);
+      this.weapons.forEach(weapon => {
+         this.physics.add.collider(weapon, this.platform);
+         this.physics.add.collider(weapon, this.ground);
+      })
 
       this.camera = this.cameras.main.startFollow(this.player);
    }
@@ -94,28 +106,56 @@ export default class MainScene extends Phaser.Scene {
 
    //Следование заднего фона за игроком
    followBG() {
-      this.bg.x = this.player.body.x;
-      this.bg.y = this.player.body.y;
+      this.bg.setPosition(this.player.body.x, this.player.body.y);
    }
 
    //регистрация выстрела для всех указанного игрока
    fire(player) {
       if (player.mouse.leftButtonDown() && player.haveWeapon && player.canFire) {
-         this.bullets.push(this.physics.add.existing(new Bullet(this, player, this.mouse))) 
+
+         const bullet = this.physics.add.existing(new Bullet(this, player, this.mouse))
+         this.physics.add.collider(bullet, this.platform);
+         this.physics.add.collider(bullet, this.ground);
+         this.bullets.push(bullet);
+         this.sound.play("pistolShot");
          player.canFire = false;
       }
-      else if (this.mouse.leftButtonReleased()){
-            player.canFire = true;
+      else if (this.mouse.leftButtonReleased()) {
+         player.canFire = true;
       }
-      
+   }
+
+   //Взятие игроком оружия
+   takeGun(gun, index, player) {
+      if (player.body.hitTest(gun.x, gun.y) && this.coursor.action.isDown && player.action) {
+         console.log(player.action)
+         if (player.haveWeapon) {
+            const tempWeapon = player.weapon;
+            tempWeapon.setGravityY(0);
+            player.weapon = null
+            this.weapons.push(this.physics.add.existing(tempWeapon));
+         }
+         player.weapon = this.physics.add.existing(gun);
+         this.weapons.splice(index, 1)
+         player.weapon.setGravityY(-800);
+         player.canFire = true;
+         player.haveWeapon = true;
+      }
+   }
+
+   takeGuns() {
+      this.weapons.forEach((weapon, index) => {
+         this.takeGun(weapon, index, this.player);
+      })
+
    }
 
    update() {
       this.player.update();
       this.followBG();
-      this.player.takeGun(this.gun);
+      this.takeGuns();
       this.fire(this.player);
       this.allBulletsTraectory(this.bullets);
-      
+
    }
 }
