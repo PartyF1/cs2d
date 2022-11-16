@@ -39,5 +39,18 @@ export default class Server {
   async getUserByLogin(login) {
         const data = await this.send({method : 'getUserByLogin', login});
         return data;
-}
+  }
+
+  async getLobbys() {
+    return await this.send({method: 'getLobbys'})
+  }
+
+  async createLobby() {
+    return await this.send({method: 'createLobby', token: this.token})
+  }
+
+  async joinToLobby() {
+    return await this.send({method: 'joinToLobby', token: this.token})
+  }
+
 }

@@ -3,7 +3,6 @@ import Phaser from "phaser";
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, coursor, mouse, character, bullets) {
-=======
 
         super(scene, x, y, character);
         this.setScale(2, 2);
