@@ -1,6 +1,9 @@
+import { useState } from 'react';
+
 import Game from '../game/game';
 import Chat from './chat/Chat.js';
-import { useState } from 'react';
+import LobbyList from './lobby/LobbyList';
+
 import './authorization/authorization.css';
 import './menu.css';
 
@@ -21,25 +24,40 @@ export default function Header(props) {
   function openChat() {
     setState(state === 'chat' ? 'menu' : 'chat');
   }
+  
+  // временно ===============
+  function openLobbyList() {
+    setState('lobby');
+  }
+  // временно ===============
 
   return (
     <div>
       {state === 'game' ? (
         <Game server={server} />
       ) : (
-        <div className="menu">
-          <div>
-            <button className="button" onClick={gameStart}>
-              ИГРАТЬ
-            </button>
-            <button className="button">ПЕРСОНАЛИЗАЦИЯ</button>
-            <button className="button">НАСТРОЙКИ</button>
-            <button className="button" onClick={logout}>
-              ВЫЙТИ
-            </button>
-            <button className="buttonChat" onClick={openChat}></button>
+        <div>
+        {state === 'lobby' ? (
+          <LobbyList server={server} openMenu={(state) => setState(state)}/>
+        ) : (
+          <div className="menu">
+            <div>
+              {/* Временно =================================================*/}
+              <button className="button" onClick={openLobbyList} >Лобби</button>
+              {/* Временно =================================================*/}
+              <button className="button" onClick={gameStart}>
+                ИГРАТЬ
+              </button>
+              <button className="button">ПЕРСОНАЛИЗАЦИЯ</button>
+              <button className="button">НАСТРОЙКИ</button>
+              <button className="button" onClick={logout}>
+                ВЫЙТИ
+              </button>
+              <button className="buttonChat" onClick={openChat}></button>
+            </div>
+            {state === 'chat' ? <Chat server={server} data={data}></Chat> : ''}
           </div>
-          {state === 'chat' ? <Chat server={server} data={data}></Chat> : ''}
+        )}
         </div>
       )}
     </div>
