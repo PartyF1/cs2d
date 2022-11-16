@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Lobby(props) {
+export default function AccessibleLobby(props) {
   const { lobby, server } = props;
   return (
     <div>

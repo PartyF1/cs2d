@@ -24,11 +24,7 @@ export default function Header(props) {
   function openChat() {
     setState(state === 'chat' ? 'menu' : 'chat');
   }
-
-  function openMenu() {
-    setState('menu');
-  }
-
+  
   // временно ===============
   function openLobbyList() {
     setState('lobby');
@@ -42,7 +38,7 @@ export default function Header(props) {
       ) : (
         <div>
         {state === 'lobby' ? (
-          <LobbyList server={server} openMenu={openMenu}/>
+          <LobbyList server={server} openMenu={(state) => setState(state)}/>
         ) : (
           <div className="menu">
             <div>

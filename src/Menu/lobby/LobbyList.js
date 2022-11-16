@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Lobby from "./lobby"
+import AccessibleLobby from "./AccessibleLobby"
 import "./lobby.css"
 
 export default function LobbyList(props) {
@@ -7,7 +7,6 @@ export default function LobbyList(props) {
   const [state, setState] = useState();
 
   let lobbys = [{
-    name : "Artemka zahodi",
     players : 3
   }];
 
@@ -30,7 +29,7 @@ export default function LobbyList(props) {
       <h2>Список игр</h2>
       <div className="lobbysField">
         {lobbys.map((element, index) => {
-          return (<Lobby key={index} lobby={element} server={server}></Lobby>)
+          return (<AccessibleLobby key={index} lobby={element} server={server}></AccessibleLobby>)
         })}
       </div>
       <button onClick={server.createLobby}>Создать лобби</button>
