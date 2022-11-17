@@ -1,11 +1,8 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import './authorization.css';
 
-import Registration from './registration';
-
 export default function Authorization(props) {
-  const { setData, server } = props;
-  const [registForm, setRegistForm] = useState(false);
+  const { setData, server, setState } = props;
 
   const login = useRef();
   const password = useRef();
@@ -14,15 +11,8 @@ export default function Authorization(props) {
     setData(await server.login(login.current.value, password.current.value));
   }
 
-  function registFormHandler() {
-    setRegistForm(!registForm);
-  }
-
   return (
     <form className="form">
-      {registForm ? (
-        <Registration registFormHandler={registFormHandler} setData={setData} server={server}/>
-      ) : (
         <fieldset className="form-inner">
           <h2>Авторизация</h2>
 
@@ -46,12 +36,10 @@ export default function Authorization(props) {
               <a href="#" onClick={sendLoginHandler}></a>
             </span>
             <span>
-              <span>Нет аккаунта? : </span>
-              <a href="#" onClick={registFormHandler}>Регистрация</a>
+              <a href="#" onClick={setState}>закрыть</a>
             </span>
           </div>
         </fieldset>
-      )}
     </form>
   );
 }

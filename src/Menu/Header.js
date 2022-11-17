@@ -4,7 +4,7 @@ import Game from '../game/game';
 import Chat from './chat/Chat.js';
 import LobbyList from './lobby/LobbyList';
 
-import './authorization/authorization.css';
+import '../startScreen/authorization.css';
 import './menu.css';
 
 export default function Header(props) {

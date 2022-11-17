@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import './authorization.css';
 
 export default function Registration(props) {
-  const { registFormHandler, setData, server } = props;
+  const { setState, setData, server } = props;
 
   const newLog = useRef();
   const newPass = useRef();
@@ -66,8 +66,7 @@ export default function Registration(props) {
           <b href="#" onClick={sendRegHendler}></b>
         </span>
         <span className="registBtn">
-          <span>Уже есть аккаунт ? : </span>
-          <a href="#" onClick={registFormHandler}>Авторизоваться</a>
+          <a href="#" onClick={setState}>закрыть</a>
         </span>
       </div>
     </fieldset>
