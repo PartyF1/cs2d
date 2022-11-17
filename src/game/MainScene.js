@@ -2,7 +2,6 @@ import Phaser from "phaser";
 import Bullet from "./entities/bullet.js";
 import Player from "./entities/player.js"
 import Pistol from "./entities/weapons/pistol.js";
-import Weapon from "./entities/weapons/weapon.js";
 
 
 
@@ -114,12 +113,14 @@ export default class MainScene extends Phaser.Scene {
 
    //регистрация выстрела для всех указанного игрока
    fire(player) {
-      if (player.mouse.leftButtonDown() && player.haveWeapon && player.canFire) {
+      if (player.mouse.leftButtonDown() && player.haveWeapon && player.canFire && player.weapon.ammo) {
          const bullet = this.physics.add.existing(new Bullet(this, player, this.mouse))
          this.physics.add.collider(bullet, this.platform);
          this.physics.add.collider(bullet, this.ground);
          this.bullets.push(bullet);
-         this.sound.play("pistolShot");
+         this.sound.play("pistolShot");  
+         player.weapon.ammo--;
+         this.events.emit("fire");
          player.canFire = false;
       }
       else if (this.mouse.leftButtonReleased()) {

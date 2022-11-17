@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Phaser from "phaser";
 import MainScene from "./MainScene";
+import UI from "./UI";
 
 export default function Game(props) {
    const {server} = props;
@@ -17,7 +18,7 @@ export default function Game(props) {
                debug: true,
             }
          },
-         scene: [new MainScene(server)]
+         scene: [new MainScene(server), UI]
       }
       new Phaser.Game(config)  
    });

@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
-import './authorization.css';
-
 import Registration from './registration';
+import './authorization.css';
 
 export default function Authorization(props) {
   const { setData, server } = props;
