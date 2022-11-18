@@ -38,7 +38,7 @@ export default function Header(props) {
       ) : (
         <div>
         {state === 'lobby' ? (
-          <LobbyList server={server} openMenu={(state) => setState(state)}/>
+          <LobbyList data={data} server={server} openMenu={(state) => setState(state)}/>
         ) : (
           <div className="menu">
             <div>

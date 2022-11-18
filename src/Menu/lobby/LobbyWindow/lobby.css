@@ -1,0 +1,66 @@
+
+.button {
+   margin-bottom: 3ch;
+   padding: 15px 30px;
+   text-align: center;
+   text-transform: uppercase;
+   transition: 0.5s;
+   background-size: 200% auto;
+   color: white;
+   border-radius: 10px;
+   display: block;
+   border: 0px;
+   font-weight: 700;
+   box-shadow: 0px 0px 14px -7px #f09819;
+   background-image: linear-gradient(45deg, #FF512F 0%, #F09819  51%, #FF512F  100%);
+   cursor: pointer;
+   user-select: none;
+   -webkit-user-select: none;
+   touch-action: manipulation;
+   width: 200px;
+   font-size: 1em;
+ }
+ 
+ .button:hover {
+   background-position: right center;
+   /* change the direction of the change here */
+   color: #fff;
+   text-decoration: none;
+ }
+ 
+ .button:active {
+   transform: scale(0.95);
+ }
+ .buttonChat:active {
+   transform: scale(0.95);
+ }
+ .buttonChat{
+   position: absolute;
+   background-position: center;
+    background-image: url(/public/chat.png);
+    background-color:rgb(255, 175, 3);
+    background-repeat: no-repeat;
+    background-size:80%;
+    padding: 5ch 5ch;
+    border-radius: 10ch;
+    color:rgb(255, 255, 255);
+    border-color: #f09819;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    font-size: 1em;
+   left: 5ch;
+   bottom: 5ch;
+ }
+ 
+ .buttonChat:hover{
+    background-position: center;
+    color: #fff;
+    text-decoration: none;
+    background-color: rgba(232, 173, 46, 0.7);
+    color:rgb(255, 255, 255);
+    border-color: #ffac38;
+ }
+ 
+ 

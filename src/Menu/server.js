@@ -49,8 +49,12 @@ export default class Server {
     return await this.send({method: 'createLobby', token: this.token})
   }
 
-  async joinToLobby() {
-    return await this.send({method: 'joinToLobby', token: this.token})
+  async connectById(id) {
+    return await this.send({method: "connectById", id, token: this.token})
+  }
+
+  async deleteLobby(id) {
+    return await this.send({method: "deleteLobby", id, token: this.token})
   }
 
 }
