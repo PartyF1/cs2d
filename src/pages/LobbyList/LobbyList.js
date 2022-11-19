@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import AccessibleLobby from "./AccessibleLobby"
-import Lobby from "./LobbyWindow/lobby";
 import "./lobby.css"
 
 let lobbys = [{
   id: 423,
   players : 3,
-  host: "Vasya"
+  host: "Negro"
 }];
 
 export default function LobbyList(props) {
-  const { server, openMenu, data } = props;
+  const { server, setPage, userData, setLobbyId } = props;
   const [state, setState] = useState();
 
 
@@ -23,21 +22,19 @@ export default function LobbyList(props) {
     setState(!state);
   }
 
-  async function connect(id) {
-    const lobby = await server.connectById(id);
-    const user = data.name == lobby.host? "host" : "";
+  async function joinToLobby(id) {
+    //const lobby = await server.joinToLobby(id);
+    const lobby = lobbys[0];
     if (lobby) {
-      return (
-        <div>
-          <Lobby id={id} server={server} user={user} onLobby={(state) => setState(state)}></Lobby>
-        </div>
-      )
+      userData.lobbyStatus = userData.name == lobby.host? "host" : "";
+      setLobbyId(id);
+      setPage("Lobby");
     }
   }
 
   async function createLobby() {
     const lobby = await server.createLobby();
-    connect(lobby.id);
+    joinToLobby(lobby.id);
   }
 
   useEffect(() => {
@@ -46,16 +43,20 @@ export default function LobbyList(props) {
     }, 1000)
   })
 
+  const toMenu = () => {
+    setPage("Menu")
+  }
+
   return (
     <div className="lobbyContainer">
       <h2>Список игр</h2>
       <div className="lobbysField">
         {lobbys.map((element, index) => {
-          return (<AccessibleLobby key={index} lobby={element} server={server} connect={connect}></AccessibleLobby>)
+          return (<AccessibleLobby key={index} lobby={element} server={server} joinToLobby={joinToLobby}></AccessibleLobby>)
         })}
       </div>
       <button onClick={createLobby}>Создать лобби</button>
-      <button onClick={openMenu}>Главное меню</button>
+      <button onClick={toMenu}>Главное меню</button>
     </div>
   );
 }

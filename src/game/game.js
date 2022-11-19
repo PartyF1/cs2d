@@ -1,11 +1,9 @@
-import { useEffect } from "react";
 import Phaser from "phaser";
 import MainScene from "./MainScene";
 
-export default function Game(props) {
-   const {server} = props;
-   useEffect(() => {
-      const config = {
+export default class Game{ 
+   constructor(server) {   
+      this.config = {
          type: Phaser.AUTO,
          width: window.innerWidth,
          height: window.innerHeight,
@@ -13,13 +11,15 @@ export default function Game(props) {
          physics: {
             default: "arcade",
             arcade: {
-               gravity: {y: 800},
+               gravity: { y: 800 },
                debug: true,
             }
          },
          scene: [new MainScene(server)]
-      }
-      new Phaser.Game(config)  
-   });
-   return(<></>)
+      }   
+      
+   }
+   render() {
+      return new Phaser.Game(this.config);
+   }
 }

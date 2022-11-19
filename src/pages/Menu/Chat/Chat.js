@@ -7,7 +7,7 @@ let hash;
 
 export default function Chat(props) {
    
-   const { server, data } = props;
+   const { server, userData } = props;
    const [state, setState] = useState();
    const input = useRef();
    const myRef = useRef(null);
@@ -35,7 +35,7 @@ export default function Chat(props) {
 
    async function sendMessage() {
       if (input.current.value) {
-         await server.sendMessage(data.name, input.current.value);
+         await server.sendMessage(userData.name, input.current.value);
          input.current.value = "";
       }
       executeScroll();

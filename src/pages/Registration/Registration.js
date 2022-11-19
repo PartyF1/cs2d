@@ -1,8 +1,8 @@
 import { useRef } from 'react';
-import './authorization.css';
+import './registration.css';
 
 export default function Registration(props) {
-  const { setState, setData, server } = props;
+  const { setPage, setUserData, server } = props;
 
   const newLog = useRef();
   const newPass = useRef();
@@ -11,9 +11,13 @@ export default function Registration(props) {
 
   async function sendRegHendler() {
     if (newPass.current.value === repeatPass.current.value) {
-      setData(await server.registration(newLog.current.value, newPass.current.value, userName.current.value))
+      setUserData(await server.registration(newLog.current.value, newPass.current.value, userName.current.value))
+      setPage("Authorisation");
     }
-    else return false;
+  }
+
+  const closePage = () => {
+    setPage("StartScreen")
   }
 
   return (
@@ -66,7 +70,7 @@ export default function Registration(props) {
           <b href="#" onClick={sendRegHendler}></b>
         </span>
         <span className="registBtn">
-          <a href="#" onClick={setState}>закрыть</a>
+          <a href="#" onClick={closePage}>закрыть</a>
         </span>
       </div>
     </fieldset>

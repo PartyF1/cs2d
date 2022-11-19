@@ -2,13 +2,21 @@ import { useRef } from 'react';
 import './authorization.css';
 
 export default function Authorization(props) {
-  const { setData, server, setState } = props;
+  const { setUserData, server, setPage } = props;
 
   const login = useRef();
   const password = useRef();
 
   async function sendLoginHandler() {
-    setData(await server.login(login.current.value, password.current.value));
+    const access = await server.login(login.current.value, password.current.value);
+    if (access) {
+      setUserData(access);
+      setPage("Menu");
+    }
+  }
+
+  const closePage = () => {
+    setPage("StartScreen")
   }
 
   return (
@@ -32,11 +40,10 @@ export default function Authorization(props) {
 
           <div className="form-type">
             <span className="loginBtn">
-              {' '}
               <a href="#" onClick={sendLoginHandler}></a>
             </span>
             <span>
-              <a href="#" onClick={setState}>закрыть</a>
+              <a href="#" onClick={closePage}>закрыть</a>
             </span>
           </div>
         </fieldset>

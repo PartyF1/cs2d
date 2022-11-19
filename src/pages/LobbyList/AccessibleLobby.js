@@ -1,17 +1,17 @@
 import React from "react";
 
 export default function AccessibleLobby(props) {
-  const { lobby, server, connect } = props;
+  const { lobby, server, joinToLobby } = props;
 
-  const connectToLobby = () => {
-    connect(lobby.id);
+  const join = () => {
+    joinToLobby(lobby.id);
   }
 
   return (
     <div>
       <div className="lobbyId">{lobby.id}</div>
       <div className="playersCount">{lobby.players}</div>
-      <button onClick={connectToLobby}>Присоединиться</button>
+      <button onClick={join}>Присоединиться</button>
     </div>
   );
 }

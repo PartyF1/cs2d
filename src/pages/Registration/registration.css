@@ -1,0 +1,180 @@
+input[type=login]{
+  display: block;
+  width: 70%;
+  border: 2px solid #aaa;
+  border-radius: 5px;
+  margin: 0 auto;
+  outline: none;
+  padding: 8px;
+  box-sizing: border-box;
+  transition: .3s;
+  margin-bottom: 2ch;
+}
+
+input[type=password]{
+  display: block;
+  width: 70%;
+  border: 2px solid #aaa;
+  border-radius: 5px;
+  margin: 0 auto;
+  outline: none;
+  padding: 8px;
+  box-sizing: border-box;
+  transition: .3s;
+  margin-bottom: 2ch;
+}
+
+fieldset {
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+}
+
+input[type=login]:focus,input[type=password]:focus{
+  border-color:rgb(158, 12, 12);
+  box-shadow:0 0 3px 0 rgb(255, 145, 0);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: rgb(56, 56, 56);
+}
+
+.loginBtn {
+  position: relative;
+  display: inline-flex;
+  width: 180px;
+  height: 55px;
+  margin: 20px 0px;
+  perspective: 1000px;
+}
+
+.loginBtn a {
+  font-size: 19px;
+  letter-spacing: 1px;
+  transform-style: preserve-3d;
+  transform: translateZ(-25px);
+  transition: transform .25s;
+  font-family: 'Montserrat', sans-serif;
+
+}
+
+.loginBtn a:before,
+.loginBtn a:after {
+  position: absolute;
+  content: "ВОЙТИ";
+  height: 55px;
+  width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid black;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.loginBtn a:before {
+  color: #fff;
+  background: #000;
+  transform: rotateY(0deg) translateZ(25px);
+}
+
+.loginBtn a:after {
+  color: #000;
+  transform: rotateX(90deg) translateZ(25px);
+}
+
+.loginBtn a:hover {
+  transform: translateZ(-25px) rotateX(-90deg);
+}
+
+.menu {
+  visibility: visible;
+}
+
+/* registtation */
+
+.loginBtn b {
+  font-size: 19px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform: translateZ(-25px);
+  transition: transform .25s;
+  font-family: 'Montserrat', sans-serif;
+
+}
+
+.loginBtn b:before,
+.loginBtn b:after {
+  position: absolute;
+  content: "РЕГИСТРАЦИЯ";
+  height: 55px;
+  width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid black;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.loginBtn b:before {
+  color: #fff;
+  background: #000;
+  transform: rotateY(0deg) translateZ(25px);
+}
+
+.loginBtn b:after {
+  color: #000;
+  transform: rotateX(90deg) translateZ(25px);
+}
+
+.loginBtn b:hover {
+  transform: translateZ(-25px) rotateX(-90deg);
+}
+
+.form-inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 500px;
+  width: 400px;
+  border-radius: 10px;
+}
+
+.details {
+  font-size: 15px;
+}
+
+.form-type {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  bottom: 10px;
+}
+
+.form-input {
+  display: block;
+  width: 70%;
+  border: 2px solid #aaa;
+  border-radius: 5px;
+  margin: 0 auto;
+  outline: none;
+  padding: 8px;
+  box-sizing: border-box;
+  transition: .3s;
+  margin-bottom: 2ch;
+}
+
+.form-group {
+  width: 70%;
+}

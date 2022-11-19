@@ -1,5 +1,14 @@
 export default class Server {
+  constructor() {
+    this.token = null;
+    this.chatHash = null;
+    this.lobbyHash = null;
+  }
+
   async send(params = {}) {
+    if (this.token) {
+      params.token = this.token;
+    }
     const query = Object.keys(params)
       .map((key) => `${key}=${params[key]}`)
       .join('&');
@@ -23,9 +32,7 @@ export default class Server {
   }
 
   async logout() {
-    if (this.token) {
-      return await this.send({ method: 'logout', token: this.token });
-    }
+      return await this.send({ method: 'logout'});
   }
 
   async getMessages(hash){
@@ -33,28 +40,29 @@ export default class Server {
   } 
 
   async sendMessage(name, message) {
-    return await this.send({ method: 'sendMessage', name, message, token: this.token });
-  }
-
-  async getUserByLogin(login) {
-        const data = await this.send({method : 'getUserByLogin', login});
-        return data;
+    return await this.send({ method: 'sendMessage', name, message});
   }
 
   async getLobbys() {
-    return await this.send({method: 'getLobbys'})
+    return await this.send({ method: 'getLobbys' })
   }
 
   async createLobby() {
-    return await this.send({method: 'createLobby', token: this.token})
+    return await this.send({ method: 'createLobby' })
   }
 
-  async connectById(id) {
-    return await this.send({method: "connectById", id, token: this.token})
+  async joinToLobby(id) {
+    return await this.send({method: "joinToLobby", id})
   }
 
   async deleteLobby(id) {
-    return await this.send({method: "deleteLobby", id, token: this.token})
+    return await this.send({method: "deleteLobby", id})
   }
 
+  async leaveLobby(id) {
+    return await this.send({method: "leaveLobby", id})
+  }
+  async getUsers(id) {
+    return await this.send({method: "getUsers", id})
+  }
 }
