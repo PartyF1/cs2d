@@ -4,7 +4,7 @@ import "./lobby.css"
 
 let lobbys = [{
   id: 423,
-  players : 3,
+  players: 3,
   host: "Negro"
 }];
 
@@ -17,16 +17,16 @@ export default function LobbyList(props) {
   async function getLobbys() {
     const lobbyData = await server.getLobbys();
     if (lobbyData) {
-       lobbys = lobbyData.lobbys;
-    }
-    setState(!state);
+      lobbys = lobbyData.lobbys;
+      setState(!state);
+    } 
   }
 
   async function joinToLobby(id) {
-    //const lobby = await server.joinToLobby(id);
-    const lobby = lobbys[0];
+    //const lobby = await server.joinToLobby(id); Основная функция
+    const lobby = lobbys[0]; // Для проверки работоспособности и локального переключения на лобби
     if (lobby) {
-      userData.lobbyStatus = userData.name == lobby.host? "host" : "";
+      userData.lobbyStatus = userData.name === lobby.host ? "host" : "";
       setLobbyId(id);
       setPage("Lobby");
     }
@@ -38,9 +38,10 @@ export default function LobbyList(props) {
   }
 
   useEffect(() => {
-    setTimeout(() => {
-       getLobbys();
-    }, 1000)
+    const timer = setInterval(() => {
+      getLobbys();
+    }, 500);
+    return () => clearInterval(timer);
   })
 
   const toMenu = () => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 let users = [];
 let hash;
@@ -13,13 +13,17 @@ export default function Lobby(props) {
     if (newUsers) {
       users = newUsers.users;
       hash = newUsers.hash;
+      setState(!state);
     }
-    setState(!state);
   }
 
-  setTimeout(() => {
-    getUsers();
-  }, 1000)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      getUsers();
+    }, 500);
+    return () => clearInterval(timer);
+  })
+
 
   function startMatch() { }
 

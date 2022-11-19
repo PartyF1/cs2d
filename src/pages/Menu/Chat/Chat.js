@@ -5,28 +5,34 @@ import "./chat.css"
 let messages = [];
 let hash;
 
-export default function Chat(props) {
+setInterval(() => {
    
+}, 1000)
+
+export default function Chat(props) {
+
    const { server, userData } = props;
    const [state, setState] = useState();
    const input = useRef();
    const myRef = useRef(null);
 
    useEffect(() => {
-      setTimeout(() => {
+      const timer = setInterval(() => {
          getMessages();
-      }, 1000)
-   })
+      }, 500);
+      return () => clearInterval(timer);
+    });
+   
 
    async function getMessages() {
       const mesData = await server.getMessages(hash);
       if (mesData) {
          messages = mesData.messages;
          hash = mesData.hash;
+         setState(!state);
       }
-      setState(!state);
    }
-   
+
    function keyHandler(e) {
       if (e.key === "Enter") {
          sendMessage();
@@ -47,7 +53,7 @@ export default function Chat(props) {
       <div className="chat-container">
          <div className="messages-field">
             {messages.map((element, index) => {
-                  return (<Message key={index} message={element}></Message>)
+               return (<Message key={index} message={element}></Message>)
             })}
             <div ref={myRef}></div>
          </div>
