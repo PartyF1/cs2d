@@ -17,16 +17,16 @@ export default function LobbyList(props) {
   async function getLobbys() {
     const lobbyData = await server.getLobbys();
     if (lobbyData) {
-      lobbys = lobbyData.lobbys;
+      lobbys = lobbyData;
       setState(!state);
     } 
   }
 
-  async function joinToLobby(id) {
+  async function joinToLobby(id, host = "") {
     //const lobby = await server.joinToLobby(id); Основная функция
     const lobby = lobbys[0]; // Для проверки работоспособности и локального переключения на лобби
     if (lobby) {
-      userData.lobbyStatus = userData.name === lobby.host ? "host" : "";
+      userData.lobbyStatus = host = "host"? host : "";
       setLobbyId(id);
       setPage("Lobby");
     }
@@ -34,7 +34,7 @@ export default function LobbyList(props) {
 
   async function createLobby() {
     const lobby = await server.createLobby();
-    joinToLobby(lobby.id);
+    joinToLobby(lobby.id, "host");
   }
 
   useEffect(() => {
