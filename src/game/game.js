@@ -16,10 +16,15 @@ export default class Game{
             }
          },
          scene: [new MainScene(server)]
-      }   
-      
+         
+      }  
+      this.game = null 
    }
    render() {
-      return new Phaser.Game(this.config);
+      this.game = new Phaser.Game(this.config);
+   }
+   destroy() {
+      this.game.destroy(true, false);
+      this.game = null;
    }
 }
