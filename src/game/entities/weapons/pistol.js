@@ -8,6 +8,7 @@ export default class Pistol extends Weapon {
         this.name = "Pistol"
         this.fireRate = 500;
         this.ammo = 7;
+        this.maxAmmo = 7;
         this.range = 50;
         this.bulletSpeed = 500;
         this.autoFire = false;

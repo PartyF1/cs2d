@@ -20,10 +20,10 @@ export default class UI extends Phaser.Scene {
 		})
         game.events.on("takeWeapon", (weapon)=>{
             this.weapon.setText(weapon.name);
-            this.ammo.setText("Ammo: " + weapon.ammo)
+            this.ammo.setText(`${weapon.ammo} / ${weapon.maxAmmo}`)
         })
-        game.events.on("shot", (ammo)=>{
-            this.ammo.setText("Ammo: " + ammo)
+        game.events.on("shot", (ammo, maxAmmo)=>{
+            this.ammo.setText(`${ammo} / ${maxAmmo}`)
         })
     }
 }

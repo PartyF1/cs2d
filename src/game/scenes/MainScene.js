@@ -121,7 +121,7 @@ export default class MainScene extends Phaser.Scene {
          this.sound.play("pistolShot");
          player.weapon.ammo--;
          player.weapon.canShot = false;
-         this.events.emit('shot', player.weapon.ammo);
+         this.events.emit('shot', player.weapon.ammo, player.weapon.maxAmmo);
       }
       else if (this.mouse.leftButtonReleased() && player.weapon && !player.weapon.autoFire) {
          player.weapon.coolDown(true);
