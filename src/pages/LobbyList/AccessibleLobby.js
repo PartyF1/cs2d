@@ -10,7 +10,7 @@ export default function AccessibleLobby(props) {
   return (
     <div>
       <div className="lobbyId">{lobby.id}</div>
-      <div className="playersCount">{lobby.players}</div>
+      <div className="playersCount">{lobby.amountPlayers}/{lobby.maxAmountPlayers}</div>
       <button onClick={join}>Присоединиться</button>
     </div>
   );

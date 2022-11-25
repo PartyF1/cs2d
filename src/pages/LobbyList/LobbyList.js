@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import AccessibleLobby from "./AccessibleLobby"
 import "./lobby.css"
 
-let lobbys = [{
-  id: 423,
-  players: 3,
-  host: "Negro"
-}];
+let lobbys = [];
 
 export default function LobbyList(props) {
   const { server, setPage, userData, setLobbyId } = props;
@@ -23,8 +19,8 @@ export default function LobbyList(props) {
   }
 
   async function joinToLobby(id, host = "") {
-    //const lobby = await server.joinToLobby(id); Основная функция
-    const lobby = lobbys[0]; // Для проверки работоспособности и локального переключения на лобби
+    const lobby = await server.joinToLobby(id); //Основная функция
+    //const lobby = lobbys[0]; // Для проверки работоспособности и локального переключения на лобби
     if (lobby) {
       userData.lobbyStatus = host = "host"? host : "";
       setLobbyId(id);
