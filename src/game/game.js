@@ -1,6 +1,6 @@
 import Phaser from "phaser";
-import MainScene from "./MainScene";
-import UI from "./UI";
+import MainScene from "./scenes/MainScene";
+import UI from "./scenes/UI";
 
 export default class Game{ 
    constructor(server) {   

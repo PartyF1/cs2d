@@ -1,10 +1,9 @@
 import Phaser from "phaser";
-import Bullet from "./entities/bullet.js";
-import Player from "./entities/player.js"
-import Pistol from "./entities/weapons/pistol.js";
-import Weapon from "./entities/weapons/weapon.js";
-import UI from "./UI.js";
-import Cat from "./entities/characters/Cat"
+import Bullet from "../entities/bullet.js";
+import Player from "../entities/player.js"
+import Pistol from "../entities/weapons/pistol.js";
+import Weapon from "../entities/weapons/weapon.js";
+import Cat from "../entities/characters/Cat"
 
 
 

@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import Player from "./entities/player";
 
 export default class UI extends Phaser.Scene {
     constructor(player) {

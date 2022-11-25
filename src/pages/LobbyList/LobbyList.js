@@ -49,7 +49,7 @@ export default function LobbyList(props) {
       <h2>Список игр</h2>
       <div className="lobbysField">
         {lobbys.map((element, index) => {
-          return (<AccessibleLobby key={index} lobby={element} server={server} joinToLobby={joinToLobby}></AccessibleLobby>)
+          return (<AccessibleLobby key={index} lobby={element} joinToLobby={joinToLobby}></AccessibleLobby>)
         })}
       </div>
       <button onClick={createLobby}>Создать лобби</button>

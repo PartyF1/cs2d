@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function AccessibleLobby(props) {
-  const { lobby, server, joinToLobby } = props;
+  const { lobby, joinToLobby } = props;
 
   const join = () => {
     joinToLobby(lobby.id);
