@@ -2,6 +2,7 @@ import Phaser from "phaser";
 
 export default class Cat extends Phaser.Animations.AnimationManager {
     constructor(player) {
+        super("mainScene")
         this.texture = "cat";
         this.ability = "wallJump";
         this.abilityTrigger = "jump";

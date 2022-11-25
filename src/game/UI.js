@@ -16,7 +16,7 @@ export default class UI extends Phaser.Scene {
         this.weapon = this.add.text(this.w-200, this.h-150, "", {
 			fontSize: 32
 		})
-        this.ammo = this.add.text(this.w-200, this.h-100, `Ammo: `, {
+        this.ammo = this.add.text(this.w-200, this.h-100, "", {
 			fontSize: 32
 		})
         game.events.on("takeWeapon", (weapon)=>{

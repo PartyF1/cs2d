@@ -11,5 +11,14 @@ export default class Pistol extends Weapon {
         this.range = 50;
         this.bulletSpeed = 500;
         this.autoFire = false;
+        this.canShot = true;
+        this.inProgress = false
+    }
+
+    coolDown(fireBottonIsUp = false) {
+        if (fireBottonIsUp && !this.canShot && !this.inProgress) {
+            this.inProgress = true;
+            setTimeout(() => {this.canShot=true; this.inProgress=false}, 200)
+        }       
     }
 }

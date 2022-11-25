@@ -88,7 +88,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.weapon.rotation = Math.atan2(this.vector.y, this.vector.x);
             this.weapon.setPosition(this.body.center.x + this.vector.x, this.body.center.y + this.vector.y + 5)
             this.weapon.flipY = this.flipX? true : false;
-
         }
     }
 

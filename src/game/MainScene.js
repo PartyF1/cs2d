@@ -4,6 +4,7 @@ import Player from "./entities/player.js"
 import Pistol from "./entities/weapons/pistol.js";
 import Weapon from "./entities/weapons/weapon.js";
 import UI from "./UI.js";
+import Cat from "./entities/characters/Cat"
 
 
 
@@ -113,18 +114,18 @@ export default class MainScene extends Phaser.Scene {
 
    //регистрация выстрела для всех указанного игрока
    fire(player) {
-      if (player.mouse.leftButtonDown() && player.haveWeapon && player.canFire && player.weapon.ammo) {
+      if (player.mouse.leftButtonDown() && player.haveWeapon && player.weapon?.canShot && player.weapon.ammo) {
          const bullet = this.physics.add.existing(new Bullet(this, player, this.mouse))
          this.physics.add.collider(bullet, this.platform);
          this.physics.add.collider(bullet, this.ground);
          this.bullets.push(bullet);
          this.sound.play("pistolShot");
          player.weapon.ammo--;
-         player.canFire = false;
+         player.weapon.canShot = false;
          this.events.emit('shot', player.weapon.ammo);
       }
-      else if (this.mouse.leftButtonReleased()) {
-         player.canFire = true;
+      else if (this.mouse.leftButtonReleased() && player.weapon && !player.weapon.autoFire) {
+         player.weapon.coolDown(true);
       }
    }
 
@@ -151,7 +152,6 @@ export default class MainScene extends Phaser.Scene {
       this.weapons.forEach((weapon, index) => {
          this.takeGun(weapon, index, this.player);
       })
-
    }
 
    update() {
