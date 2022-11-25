@@ -96,7 +96,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     update() {
         this.movement();
         this.jumping();
-
         this.gunMove();
         this.view();
         this.actionCheck()

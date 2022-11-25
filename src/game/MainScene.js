@@ -3,13 +3,14 @@ import Bullet from "./entities/bullet.js";
 import Player from "./entities/player.js"
 import Pistol from "./entities/weapons/pistol.js";
 import Weapon from "./entities/weapons/weapon.js";
+import UI from "./UI.js";
 
 
 
 
 export default class MainScene extends Phaser.Scene {
    constructor(server) {
-      super("mainScene");
+      super({key: "mainScene"});
 
       this.server = server;
 
@@ -81,6 +82,7 @@ export default class MainScene extends Phaser.Scene {
       })
 
       this.camera = this.cameras.main.startFollow(this.player);
+      this.scene.launch("ui", {player : this.player})
    }
 
 
@@ -111,14 +113,15 @@ export default class MainScene extends Phaser.Scene {
 
    //регистрация выстрела для всех указанного игрока
    fire(player) {
-      if (player.mouse.leftButtonDown() && player.haveWeapon && player.canFire) {
-
+      if (player.mouse.leftButtonDown() && player.haveWeapon && player.canFire && player.weapon.ammo) {
          const bullet = this.physics.add.existing(new Bullet(this, player, this.mouse))
          this.physics.add.collider(bullet, this.platform);
          this.physics.add.collider(bullet, this.ground);
          this.bullets.push(bullet);
          this.sound.play("pistolShot");
+         player.weapon.ammo--;
          player.canFire = false;
+         this.events.emit('shot', player.weapon.ammo);
       }
       else if (this.mouse.leftButtonReleased()) {
          player.canFire = true;
@@ -140,6 +143,7 @@ export default class MainScene extends Phaser.Scene {
          player.weapon.setGravityY(-800);
          player.canFire = true;
          player.haveWeapon = true;
+         this.events.emit('takeWeapon', player.weapon);
       }
    }
 

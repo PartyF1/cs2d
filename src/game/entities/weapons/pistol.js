@@ -5,6 +5,7 @@ export default class Pistol extends Weapon {
         super(scene, x, y, "pistol");
         this.setScale(0.03);
         this.flipX = true;
+        this.name = "Pistol"
         this.fireRate = 500;
         this.ammo = 7;
         this.range = 50;

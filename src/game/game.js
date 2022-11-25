@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import MainScene from "./MainScene";
+import UI from "./UI";
 
 export default class Game{ 
    constructor(server) {   
@@ -15,7 +16,7 @@ export default class Game{
                debug: true,
             }
          },
-         scene: [new MainScene(server)]
+         scene: [new MainScene(server), new UI()]
          
       }  
       this.game = null 
