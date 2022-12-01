@@ -5,15 +5,14 @@ import Authorization from "./pages/Authorisation/Authorization";
 import Registration from "./pages/Registration/Registration";
 import Header from './pages/Menu/Header';
 import LobbyList from "./pages/LobbyList/LobbyList";
-import Lobby from "./pages/Lobby/Lobby";
 import GamePage from './pages/GamePage/GamePage';
 
 import './App.css';
 
+
 function AppMain({ server }) {
   const [userData, setUserData] = useState();
   const [page, setPage] = useState('StartScreen');
-  const [lobbyId, setLobbyId] = useState();
 
   return (
     <div className="App">
@@ -27,11 +26,9 @@ function AppMain({ server }) {
         page === "Menu" ? 
           <Header setUserData={setUserData} userData={userData} server={server} setPage={setPage} /> :
         page === "LobbyList" ?
-          <LobbyList userData={userData} server={server} setPage={setPage} setLobbyId={setLobbyId}/> :
-        page === "Lobby" ? 
-          <Lobby userData={userData} server={server} setPage={setPage} lobbyId={lobbyId} setLobbyId={setLobbyId}/> : 
+          <LobbyList userData={userData} server={server} setPage={setPage}/> :
         page === "Game" ? 
-          <GamePage userData={userData} server={server} setPage={setPage}/> : ""
+          <GamePage gamer={server.gamer} server={server} setPage={setPage}/> : ""
       }
     </div>
   );

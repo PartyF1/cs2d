@@ -2,12 +2,14 @@ import Game from "../../game/game";
 import "./GamePage.css"
 
 export default function GamePage(props) {
-    const { userData, server, setPage } = props;
-    let game = new Game(server);
+    const { server, setPage, gamer } = props;
+
+    let game = new Game(server, gamer);
 
     function exitGame() {
         game.destroy(true, false);
         game = null;
+        server.gamer = null;
         setPage("Menu")
     }
 

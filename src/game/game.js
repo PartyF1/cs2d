@@ -3,7 +3,8 @@ import MainScene from "./scenes/MainScene";
 import UI from "./scenes/UI";
 
 export default class Game{ 
-   constructor(server) {   
+   constructor(server, gamer) {   
+      this.matchId = gamer.matchId;
       this.config = {
          type: Phaser.AUTO,
          width: window.innerWidth,

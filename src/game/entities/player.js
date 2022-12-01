@@ -2,10 +2,9 @@ import Phaser from "phaser";
 
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, coursor, mouse, character, bullets) {
-
-        super(scene, x, y, character);
-        this.setScale(2, 2);
+    constructor(scene, x, y, coursor, mouse, bullets) {
+        super(scene, x, y, "catStay");
+        this.setDisplaySize(36, 50);
         this.scene.add.existing(this);
         //-----------------------
         this.coursor = coursor;
@@ -19,7 +18,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.vector = null;
         this.weapon = null;
         this.action = 2;
-
+        this.scene.physics.add.collider(this, scene.ground)
+        /*  В дальнейшем всё дерьмо можно будет переписать всё сюда, просто делая это через this.scene,
+            в том числе выстрел, который не получилось сделать ранее(личное напоминание).
+            Тогда она будет работать не как хуйня и даст намного более широкие возможности унификации,
+            скажем, разгрузить главную сцену настолько, чтобы там не осталось нихрена, кроме объявления объектов
+        this.coursor = this.scene.input.keyboard.addKeys(
+            {
+               up: Phaser.Input.Keyboard.KeyCodes.SPACE,
+               down: Phaser.Input.Keyboard.KeyCodes.s,
+               left: Phaser.Input.Keyboard.KeyCodes.A,
+               right: Phaser.Input.Keyboard.KeyCodes.D,
+               action: Phaser.Input.Keyboard.KeyCodes.E,
+            }
+         );
+         */
     }
 
     //одиночный прыжок
@@ -29,6 +42,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.count++;
         }
     }
+
 
     actionCheck() {
         if (this.coursor.action.isDown && this.action > 0) this.action--;

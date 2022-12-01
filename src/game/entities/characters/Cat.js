@@ -1,16 +1,16 @@
 import Phaser from "phaser";
 
-export default class Cat extends Phaser.Animations.AnimationManager {
-    constructor(player) {
-        super("mainScene")
-        this.texture = "cat";
+export default class Cat extends Phaser.Animations.Animation {
+    constructor(player, game) {
+        super()
+        this.texture = "catStay";
         this.ability = "wallJump";
         this.abilityTrigger = "jump";
         this.player = player;
 
         this.create({
             key: "run",
-            frames: this.generateFrameNumbers("catRun", {start: 0, end: 10}),
+            frames: this.generateFrameNumbers("catRun", {start: 0, end: 8}),
             frameRate: 30,
             repeat: -1
         })

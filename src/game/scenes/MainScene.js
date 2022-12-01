@@ -2,7 +2,6 @@ import Phaser from "phaser";
 import Bullet from "../entities/bullet.js";
 import Player from "../entities/player.js"
 import Pistol from "../entities/weapons/pistol.js";
-import Weapon from "../entities/weapons/weapon.js";
 import Cat from "../entities/characters/Cat"
 
 
@@ -14,12 +13,64 @@ export default class MainScene extends Phaser.Scene {
 
       this.server = server;
 
-      this.bullets = [];
+      this.enemyPlayers = [];
+      this.allBullets = [];
+      this.myBullets = [];
       this.weapons = [];
-
+      this.staticObjects = [];
 
       this.centWidth = window.outerWidth / 2;
       this.centHeight = window.outerHeight / 2;
+   }
+
+   async loadTextures() {
+      const textures = await this.server.getTextures();
+      textures.forEach((texture) => {
+         switch (texture.type) {
+            case "image":
+               this.load.image(texture.key, `./assets/${texture.key}`)
+               break;
+            case "sprite":
+               this.load.spritesheet(texture.key, `./assets/${texture.key}`);
+               break;
+            default:
+               break;
+         }
+      })
+   }
+
+   async addStaticObjects() {
+      const objects = await this.server.getStaticObjects();
+      objects.forEach((object) => {
+         const newObject = this.physics.add.staticGroup();
+         newObject.create(object.x, object.y, object.key);
+         this.staticObjects.push(newObject);
+      })
+   }
+
+   weaponCollisions() {
+      this.weapons.forEach((weapon) => {
+         this.staticObjects.forEach((staticObject) => {
+            this.physics.add.collider(weapon, staticObject);
+         })
+      })
+   }
+
+   playerCollisions() {
+      this.staticObjects.forEach((staticObject) => {
+         this.physics.add.collider(this.player, staticObject);
+      })
+   }
+
+   bulletCollisions(bullet) {
+      this.staticObjects.forEach((staticObject) => {
+         this.physics.add.collider(bullet, staticObject)
+      })
+   }
+
+   allCollisions() {
+      this.weaponCollisions();
+      this.playerCollisions();
    }
 
    preload() {
@@ -31,6 +82,8 @@ export default class MainScene extends Phaser.Scene {
       this.load.image("pistol", "assets/deagle.png");
       this.load.image("bullet", "assets/bullet.png");
       this.load.audio("pistolShot", "audio/sound/pistol.mp3");
+      this.load.spritesheet("catStay", "assets/catStay.png", {frameWidth: 18, frameHeight: 27})
+      this.load.spritesheet("catRun", "assets/catRun.png", {frameWidth: 20, frameHeight: 27})
    }
 
    create() {
@@ -61,18 +114,19 @@ export default class MainScene extends Phaser.Scene {
       
       this.anims.create({
          key: 'run',
-         frames: this.anims.generateFrameNumbers("anim", { start: 0, end: 10 }),
-         frameRate: 30,
+         frames: this.anims.generateFrameNumbers("catRun"),
+         frameRate: 20,
          repeat: -1
       });
 
       this.anims.create({
          key: 'stay',
-         frames: this.anims.generateFrameNumbers("girl"),
-         frameRate: 30,
+         frames: this.anims.generateFrameNumbers("catStay"),
+         frameRate: 6,
          repeat: -1
       });
-      this.player = this.physics.add.existing(new Player(this, this.centWidth, this.centHeight, this.coursor, this.mouse, "girl", this.bullets))
+      this.player = this.physics.add.existing(new Player(this, this.centWidth-300, this.centHeight, this.coursor, this.mouse, this.myBullets))
+      this.enemy = this.physics.add.existing(new Player(this, this.centWidth, this.centHeight))
 
       this.physics.add.collider(this.player, this.platform);
       this.physics.add.collider(this.player, this.ground);
@@ -88,9 +142,9 @@ export default class MainScene extends Phaser.Scene {
 
    //изменение пули в пространстве, либо её уничтожение при наборе предельной дальности
    setBallistic(bullet, index) {
-      if ((bullet.dist > 50) || !bullet.body.touching.none) {
+      if ((bullet.dist > bullet.maxDist) || !bullet.body.touching.none) {
          bullet.destroy();
-         this.bullets.splice(index, 1);
+         this.myBullets.splice(index, 1);
       } else {
          bullet.body.setVelocity(bullet.xs, bullet.ys)
          bullet.dist += 1;
@@ -98,10 +152,10 @@ export default class MainScene extends Phaser.Scene {
    }
 
 
-   //Изменение положения всех пуль в мире
-   allBulletsTraectory(bullets) {
-      if (bullets.length > 0)
-         bullets.forEach((bullet, index) => {
+   //Изменение положения всех пуль игрока
+   MyBulletsTraectory() {
+      if (this.myBullets.length > 0)
+         this.myBullets.forEach((bullet, index) => {
             this.setBallistic(bullet, index);
          });
    }
@@ -117,7 +171,7 @@ export default class MainScene extends Phaser.Scene {
          const bullet = this.physics.add.existing(new Bullet(this, player, this.mouse))
          this.physics.add.collider(bullet, this.platform);
          this.physics.add.collider(bullet, this.ground);
-         this.bullets.push(bullet);
+         this.myBullets.push(bullet);
          this.sound.play("pistolShot");
          player.weapon.ammo--;
          player.weapon.canShot = false;
@@ -153,12 +207,32 @@ export default class MainScene extends Phaser.Scene {
       })
    }
 
+   renderScene() {
+      this.allBullets.forEach((bullet) => {
+         bullet.setPosition(bullet.x, bullet.y)
+      })
+      this.enemyPlayers.forEach((player) => {
+         player.setPosition(player.body.x, player.body.y)
+      })
+      this.weapons.setPosition((weapon) => {
+         weapon.setPosition(weapon.x, weapon.y)
+      })
+   }
+
+   updateScene() {
+      const updatedScene = this.server.updateScene(this.myBullets, this.player.body.position, this.weapons);
+      if (updatedScene?.state === "updated") {
+         this.enemyPlayers = updatedScene.enemyPlayers;
+         this.weapons = updatedScene.weapons;
+         this.allBullets = updatedScene.bullets;
+      }
+   }
+
    update() {
       this.player.update();
       this.followBG();
       this.takeGuns();
       this.fire(this.player);
-      this.allBulletsTraectory(this.bullets);
-
+      this.MyBulletsTraectory();
    }
 }

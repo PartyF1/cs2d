@@ -1,48 +1,57 @@
 import { useState, useEffect } from "react";
-
-let users = [];
-let hash;
+let players = [];
 
 export default function Lobby(props) {
 
-  const { userData, server, setPage, lobbyId, setLobbyId } = props;
+  const { userData, server, lobbyId, setLobbyId, setLobbyPageState, lobbys, getLobbys, setPage } = props;
   const [state, setState] = useState();
 
-  async function getUsers() {
-    const newUsers = await server.getUsers(hash);
-    if (newUsers) {
-      users = newUsers.users;
-      hash = newUsers.hash;
-      setState(!state);
-    }
+  const findThisLobby = () => {
+    return lobbys.find(lobby => lobby.id === lobbyId)
   }
 
   useEffect(() => {
     const timer = setInterval(() => {
-      getUsers();
+      const update = getLobbys();
+      if (update) {
+        const lobby = findThisLobby();
+        if (lobby !== -1) {
+          players = lobby.players.split(",");
+          setState(!state);
+        }     
+        else if (server.getGamer()) {
+          startGame();
+        } else leaveLobby()
+      }
     }, 500);
     return () => clearInterval(timer);
   })
 
+  const startGame = () => {
+    setPage("Game");
+  }
 
-  function startMatch() { }
+
+  async function startMatch() {
+    await server.startMatch(lobbyId);
+  }
 
   async function deleteLobby() {
-    await server.deleteLobby(lobbyId);
+    await server.deleteLobby();
     setLobbyId(null)
-    setPage("LobbyList");
+    setLobbyPageState("list");
   }
 
   async function leaveLobby() {
     await server.leaveLobby(lobbyId);
     setLobbyId(null)
-    setPage("LobbyList");
+    setLobbyPageState("list");
   }
 
   return (
     <div>
       <div className='playerList'>список игроков
-        {users.map((user, i) => {
+        {players.map((user, i) => {
           return (
             <div key={i}>{user} </div>
           )
