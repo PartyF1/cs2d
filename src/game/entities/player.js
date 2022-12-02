@@ -2,11 +2,12 @@ import Phaser from "phaser";
 
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, coursor, mouse, bullets) {
+    constructor(scene, x, y, name, coursor, mouse, bullets) {
         super(scene, x, y, "catStay");
         this.setDisplaySize(36, 50);
         this.scene.add.existing(this);
         //-----------------------
+        this.name = name;
         this.coursor = coursor;
         this.mouse = mouse;
         //---------------------

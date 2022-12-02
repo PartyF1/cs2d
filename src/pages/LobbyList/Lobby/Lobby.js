@@ -5,24 +5,29 @@ export default function Lobby(props) {
 
   const { userData, server, lobbyId, setLobbyId, setLobbyPageState, lobbys, getLobbys, setPage } = props;
   const [state, setState] = useState();
+  
 
   const findThisLobby = () => {
-    return lobbys.find(lobby => lobby.id === lobbyId)
+    return lobbys.find((lobby) => lobby.id === lobbyId)
   }
+
 
   useEffect(() => {
     const timer = setInterval(() => {
       const update = getLobbys();
-      if (update) {
+      if(update) {
         const lobby = findThisLobby();
-        if (lobby !== -1) {
+        if (lobby) {
           players = lobby.players.split(",");
           setState(!state);
-        }     
-        else if (server.getGamer()) {
-          startGame();
-        } else leaveLobby()
-      }
+        } else {
+          server.getGamer();
+          if (server.gamer.matchId) {
+            startGame();
+          } else leaveLobby()
+        }
+        
+      }  
     }, 500);
     return () => clearInterval(timer);
   })
@@ -33,7 +38,8 @@ export default function Lobby(props) {
 
 
   async function startMatch() {
-    await server.startMatch(lobbyId);
+    const lobby = findThisLobby()
+    await server.startMatch(lobbyId, lobby.ownerId, lobby.amountPlayers, "time", "city");
   }
 
   async function deleteLobby() {

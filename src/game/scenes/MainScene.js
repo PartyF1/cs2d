@@ -9,7 +9,7 @@ import Cat from "../entities/characters/Cat"
 
 export default class MainScene extends Phaser.Scene {
    constructor(server) {
-      super({key: "mainScene"});
+      super({ key: "mainScene" });
 
       this.server = server;
 
@@ -82,8 +82,8 @@ export default class MainScene extends Phaser.Scene {
       this.load.image("pistol", "assets/deagle.png");
       this.load.image("bullet", "assets/bullet.png");
       this.load.audio("pistolShot", "audio/sound/pistol.mp3");
-      this.load.spritesheet("catStay", "assets/catStay.png", {frameWidth: 18, frameHeight: 27})
-      this.load.spritesheet("catRun", "assets/catRun.png", {frameWidth: 20, frameHeight: 27})
+      this.load.spritesheet("catStay", "assets/catStay.png", { frameWidth: 18, frameHeight: 27 })
+      this.load.spritesheet("catRun", "assets/catRun.png", { frameWidth: 20, frameHeight: 27 })
    }
 
    create() {
@@ -111,7 +111,7 @@ export default class MainScene extends Phaser.Scene {
       );
 
       this.mouse = this.input.mousePointer;
-      
+
       this.anims.create({
          key: 'run',
          frames: this.anims.generateFrameNumbers("catRun"),
@@ -125,8 +125,8 @@ export default class MainScene extends Phaser.Scene {
          frameRate: 6,
          repeat: -1
       });
-      this.player = this.physics.add.existing(new Player(this, this.centWidth-300, this.centHeight, this.coursor, this.mouse, this.myBullets))
-      this.enemy = this.physics.add.existing(new Player(this, this.centWidth, this.centHeight))
+      this.player = this.physics.add.existing(new Player(this, this.centWidth - 300, this.centHeight, this.server.gamer.gamerName, this.coursor, this.mouse, this.myBullets,))
+      this.getPlayers();
 
       this.physics.add.collider(this.player, this.platform);
       this.physics.add.collider(this.player, this.ground);
@@ -136,7 +136,7 @@ export default class MainScene extends Phaser.Scene {
       })
 
       this.camera = this.cameras.main.startFollow(this.player);
-      this.scene.launch("ui", {player : this.player})
+      this.scene.launch("ui", { player: this.player })
    }
 
 
@@ -149,6 +149,15 @@ export default class MainScene extends Phaser.Scene {
          bullet.body.setVelocity(bullet.xs, bullet.ys)
          bullet.dist += 1;
       }
+   }
+
+   async getPlayers() {
+      const players = await this.server.tempUpdate(this.player.body.x, this.player.body.y);
+      players.forEach((player) => {
+         const newEnemy = this.physics.add.existing(new Player(this, player.X*1, player.Y*1, player.gamerName))
+         newEnemy.setGravityY(-800);
+         this.enemyPlayers.push(newEnemy);
+      })
    }
 
 
@@ -207,32 +216,39 @@ export default class MainScene extends Phaser.Scene {
       })
    }
 
-   renderScene() {
-      this.allBullets.forEach((bullet) => {
+   renderScene(enemies) {
+      /*this.allBullets.forEach((bullet) => {
          bullet.setPosition(bullet.x, bullet.y)
-      })
+      })*/
       this.enemyPlayers.forEach((player) => {
-         player.setPosition(player.body.x, player.body.y)
+         const currentPlayer = enemies.find(enemy => enemy.gamerName === player.name);
+         if(currentPlayer) {
+            player.setPosition(currentPlayer.X*1, currentPlayer.Y*1)
+         }
       })
-      this.weapons.setPosition((weapon) => {
+      /*this.weapons.setPosition((weapon) => {
          weapon.setPosition(weapon.x, weapon.y)
-      })
+      })*/
    }
 
-   updateScene() {
-      const updatedScene = this.server.updateScene(this.myBullets, this.player.body.position, this.weapons);
-      if (updatedScene?.state === "updated") {
-         this.enemyPlayers = updatedScene.enemyPlayers;
-         this.weapons = updatedScene.weapons;
-         this.allBullets = updatedScene.bullets;
+
+   async updateScene() {
+      //const updatedScene = this.server.updateScene(this.myBullets, this.player.body.position.x, this.player.body.position.y, this.weapons);
+      const updatedScene = await this.server.tempUpdate(this.player.body.center.x, this.player.body.center.y);
+      if (updatedScene) {
+         //this.weapons = updatedScene.weapons;
+         //this.allBullets = updatedScene.bullets;
+         this.renderScene(updatedScene);
       }
    }
 
-   update() {
+
+   update(time = 16, delta = 60) {
       this.player.update();
       this.followBG();
       this.takeGuns();
       this.fire(this.player);
       this.MyBulletsTraectory();
+      this.updateScene();
    }
 }

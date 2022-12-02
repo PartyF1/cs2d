@@ -10,9 +10,6 @@ export default class Server {
     if (this.token) {
       params.token = this.token;
     }
-    if (this.gamer) {
-      params.matchId = this.gamer.matchId
-    }
     const query = Object.keys(params)
       .map((key) => `${key}=${params[key]}`)
       .join('&');
@@ -40,6 +37,7 @@ export default class Server {
     if (login && password) {
       const data = await this.send({ method: 'login', login, password });
       this.token = data.token;
+      await this.send({method: "setGamer"})
       delete data.token;
       return data;
     }
@@ -70,32 +68,33 @@ export default class Server {
     return await this.send({ method: 'createLobby', mode: "time", map: "city", amountPlayers: 8 })
   }
 
-  async joinToLobby(id) {
-    return await this.send({method: "joinToLobby", id})
+  async joinToLobby(lobbyId) {
+    return await this.send({method: "joinToLobby", lobbyId})
   }
 
   async deleteLobby() {
     return await this.send({method: "deleteLobby"})
   }
 
-  async leaveLobby(id) {
-    return await this.send({method: "leaveLobby", id})
+  async leaveLobby(lobbyId) {
+    return await this.send({method: "leaveLobby", lobbyId})
   }
 
   async getGamer() {
-    const data =  await this.send({method: "getGamer"})
-    if (data) {
-      this.gamer = data;
-      return true;
-    }
-    return false;
+    const tempGamer = await this.send({method: "getGamer"});
+    this.gamer = tempGamer[0];
+    return this.gamer;
   }
 
-  async startMatch() {
-    return await this.send({method: "startMatch"})
+  async startMatch(lobbyId, lobbyOwnerId, lobbyAmountPlayers, mode, map) {
+    return await this.send({method: "startMatch", lobbyId, lobbyOwnerId, lobbyAmountPlayers, mode, map})
   }
 
-  async updateScene(bullets, playerPosition, weapons) {
-    return await this.postSend({bullets, playerPosition, weapons})
+  async updateScene(bullets, X, Y, weapons) {
+    return await this.postSend({bullets, X, Y, weapons})
+  }
+
+  async tempUpdate(X, Y) {
+    return await this.send({method: "updateScene", X, Y})
   }
 }

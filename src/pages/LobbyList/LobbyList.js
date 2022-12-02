@@ -11,8 +11,6 @@ export default function LobbyList(props) {
   const [lobbyPageState, setLobbyPageState] = useState("list");
   const [lobbyId, setLobbyId] = useState();
 
-
-
   async function getLobbys() {
     const lobbyData = await server.getLobbys();
     if (lobbyData && lobbyData != lobbys) {
@@ -28,6 +26,7 @@ export default function LobbyList(props) {
     //const lobby = lobbys[0]; // Для проверки работоспособности и локального переключения на лобби
     if (lobby) {
       userData.lobbyStatus = host === "host" ? host : "";
+      getLobbys();
       setLobbyId(id);
       setLobbyPageState("lobby");
     }

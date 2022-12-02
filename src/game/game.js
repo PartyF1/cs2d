@@ -4,7 +4,7 @@ import UI from "./scenes/UI";
 
 export default class Game{ 
    constructor(server, gamer) {   
-      this.matchId = gamer.matchId;
+      this.gamer = server.gamer;
       this.config = {
          type: Phaser.AUTO,
          width: window.innerWidth,
