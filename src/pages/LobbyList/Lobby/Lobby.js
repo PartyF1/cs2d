@@ -22,7 +22,7 @@ export default function Lobby(props) {
           setState(!state);
         } else {
           server.getGamer();
-          if (server.gamer.matchId) {
+          if (server.gamer.id) {
             startGame();
           } else leaveLobby()
         }

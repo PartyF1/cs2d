@@ -1,13 +1,16 @@
 import Phaser from "phaser";
 
 
+
+
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, name, coursor, mouse, bullets) {
+    constructor(scene, x, y, name, id, coursor, mouse, bullets) {
         super(scene, x, y, "catStay");
         this.setDisplaySize(36, 50);
         this.scene.add.existing(this);
         //-----------------------
         this.name = name;
+        this.id = id;
         this.coursor = coursor;
         this.mouse = mouse;
         //---------------------
@@ -20,6 +23,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.weapon = null;
         this.action = 2;
         this.scene.physics.add.collider(this, scene.ground)
+        this.state = "alive";
         /*  В дальнейшем всё дерьмо можно будет переписать всё сюда, просто делая это через this.scene,
             в том числе выстрел, который не получилось сделать ранее(личное напоминание).
             Тогда она будет работать не как хуйня и даст намного более широкие возможности унификации,
@@ -49,14 +53,14 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.coursor.action.isDown && this.action > 0) this.action--;
         else if (this.coursor.action.isUp) this.action = 2;
     }
-    
+
     getVector() {
         return new Phaser.Math.Vector2(this.mouse.worldX - this.body.center.x, this.mouse.worldY - this.body.center.y);
     };
 
     view() {
         this.vector = this.getVector();
-        this.flipX = this.mouse.worldX < this.body.center.x ? true : false;   
+        this.flipX = this.mouse.worldX < this.body.center.x ? true : false;
     }
     //Прыжки
     jumping() {
@@ -102,8 +106,21 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.vector.setLength(22);
             this.weapon.rotation = Math.atan2(this.vector.y, this.vector.x);
             this.weapon.setPosition(this.body.center.x + this.vector.x, this.body.center.y + this.vector.y + 5)
-            this.weapon.flipY = this.flipX? true : false;
+            this.weapon.flipY = this.flipX ? true : false;
         }
+    }
+
+    dying() {
+        this.state = "died";
+        this.kill();   
+    }
+
+    respawn() {
+        setTimeout(()=> {
+            this.scene.add.existing(this);
+            this.state = "alive";
+            this.setRandomPosition(800, 400, 200, 100);
+        }, 3000)
     }
 
 

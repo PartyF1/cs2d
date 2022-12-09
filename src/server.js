@@ -1,11 +1,15 @@
+
+
 export default class Server {
   constructor() {
     this.token = null;
     this.chatHash = null;
     this.lobbyHash = null;
     this.gamer = null;
+    this.sceneHash = null;
   }
 
+  
   async send(params = {}) {
     if (this.token) {
       params.token = this.token;
@@ -22,22 +26,24 @@ export default class Server {
     if (this.token) {
       params.token = this.token;
     }
-    const responce = await fetch("http://cs2d?", {
+    const responce = await fetch(`http://cs2d?method=${params.method}`, {
+      mode: "no-cors",
       method: "POST",
       headers: {
-        "Content-Type": "application.json"
-      }, 
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(params)
     })
     const answer = await responce.json();
-    return answer?.result === "ok"? answer.data : null;
+    return answer?.result === "ok" ? answer.data : null;
   }
 
   async login(login, password) {
     if (login && password) {
       const data = await this.send({ method: 'login', login, password });
       this.token = data.token;
-      await this.send({method: "setGamer"})
+      await this.send({ method: "setGamer" })
       delete data.token;
       return data;
     }
@@ -45,23 +51,28 @@ export default class Server {
   }
 
   async registration(login, password, userName) {
-    return await this.send({method: 'registration', login, password, userName})
+    return await this.send({ method: 'registration', login, password, userName })
   }
 
   async logout() {
-      return await this.send({ method: 'logout'});
+    return await this.send({ method: 'logout' });
   }
 
-  async getMessages(hash){
-    return await this.send({method: 'getMessages', hash});
-  } 
+  async getMessages(hash) {
+    return await this.send({ method: 'getMessages', hash });
+  }
 
   async getLobbys() {
-    return await this.send({ method: 'getAllLobby' })
+    const lobbys =  await this.send({ method: 'getAllLobby' });
+    if (lobbys) {
+      return lobbys;
+    } else {
+      return [];
+    }
   }
 
   async sendMessage(name, message) {
-    return await this.send({ method: 'sendMessage', name, message});
+    return await this.send({ method: 'sendMessage', name, message });
   }
 
   async createLobby() {
@@ -69,32 +80,39 @@ export default class Server {
   }
 
   async joinToLobby(lobbyId) {
-    return await this.send({method: "joinToLobby", lobbyId})
+    return await this.send({ method: "joinToLobby", lobbyId })
   }
 
   async deleteLobby() {
-    return await this.send({method: "deleteLobby"})
+    return await this.send({ method: "deleteLobby" })
   }
 
   async leaveLobby(lobbyId) {
-    return await this.send({method: "leaveLobby", lobbyId})
+    return await this.send({ method: "leaveLobby", lobbyId })
   }
 
   async getGamer() {
-    const tempGamer = await this.send({method: "getGamer"});
-    this.gamer = tempGamer[0];
+    this.gamer = await this.send({ method: "getGamer" });
     return this.gamer;
   }
 
   async startMatch(lobbyId, lobbyOwnerId, lobbyAmountPlayers, mode, map) {
-    return await this.send({method: "startMatch", lobbyId, lobbyOwnerId, lobbyAmountPlayers, mode, map})
+    return await this.send({ method: "startMatch", lobbyId, lobbyOwnerId, lobbyAmountPlayers, mode, map })
   }
 
-  async updateScene(bullets, X, Y, weapons) {
-    return await this.postSend({bullets, X, Y, weapons})
+  async getScene() {
+    const scene = await this.send({ method: "getScene", sceneHash: this.sceneHash })
+    if (scene) {
+      this.sceneHash = scene.sceneHash;
+      return scene;
+    }
+  }
+
+  async updateScene(params) {
+    return await this.postSend({method: "updateScene", ...params })
   }
 
   async tempUpdate(X, Y) {
-    return await this.send({method: "updateScene", X, Y})
+    return await this.send({ method: "updateScene", X, Y })
   }
 }

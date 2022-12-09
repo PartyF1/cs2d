@@ -125,8 +125,17 @@ export default class MainScene extends Phaser.Scene {
          frameRate: 6,
          repeat: -1
       });
-      this.player = this.physics.add.existing(new Player(this, this.centWidth - 300, this.centHeight, this.server.gamer.gamerName, this.coursor, this.mouse, this.myBullets,))
-      this.getPlayers();
+      this.player = this.physics.add.existing(new Player(
+         this, 
+         this.centWidth - 300, 
+         this.centHeight, 
+         this.server.gamer.gamerName, 
+         this.server.gamer.id, 
+         this.coursor, 
+         this.mouse, 
+         this.myBullets
+      ))
+      this.updateScene();
 
       this.physics.add.collider(this.player, this.platform);
       this.physics.add.collider(this.player, this.ground);
@@ -143,6 +152,13 @@ export default class MainScene extends Phaser.Scene {
    //изменение пули в пространстве, либо её уничтожение при наборе предельной дальности
    setBallistic(bullet, index) {
       if ((bullet.dist > bullet.maxDist) || !bullet.body.touching.none) {
+         this.enemyPlayers.forEach((player, index) => {       
+            if(player.body.hitTest(bullet.body.x, bullet.body.y)){
+               this.updateScene(player.id)
+               player.destroy();
+               this.enemyPlayers.splice(index, 1);          
+            }
+         })
          bullet.destroy();
          this.myBullets.splice(index, 1);
       } else {
@@ -151,14 +167,6 @@ export default class MainScene extends Phaser.Scene {
       }
    }
 
-   async getPlayers() {
-      const players = await this.server.tempUpdate(this.player.body.x, this.player.body.y);
-      players.forEach((player) => {
-         const newEnemy = this.physics.add.existing(new Player(this, player.X*1, player.Y*1, player.gamerName))
-         newEnemy.setGravityY(-800);
-         this.enemyPlayers.push(newEnemy);
-      })
-   }
 
 
    //Изменение положения всех пуль игрока
@@ -177,9 +185,13 @@ export default class MainScene extends Phaser.Scene {
    //регистрация выстрела для всех указанного игрока
    fire(player) {
       if (player.mouse.leftButtonDown() && player.haveWeapon && player.weapon?.canShot && player.weapon.ammo) {
-         const bullet = this.physics.add.existing(new Bullet(this, player, this.mouse))
+         const bullet = this.physics.add.existing(new Bullet(this, player.body.center.x, player.body.center.y, null, player, this.mouse))
+         bullet.playerId = this.player.id;
          this.physics.add.collider(bullet, this.platform);
          this.physics.add.collider(bullet, this.ground);
+         this.enemyPlayers.forEach((enemy) => {
+            this.physics.add.collider(enemy, bullet);
+         })
          this.myBullets.push(bullet);
          this.sound.play("pistolShot");
          player.weapon.ammo--;
@@ -216,14 +228,22 @@ export default class MainScene extends Phaser.Scene {
       })
    }
 
-   renderScene(enemies) {
+   renderScene(enemies, bullets) {
       /*this.allBullets.forEach((bullet) => {
          bullet.setPosition(bullet.x, bullet.y)
       })*/
+      this.allBullets = [];
+      bullets.forEach((bullet) => {
+         this.allBullets.push(this.physics.add.existing(new Bullet(this, bullet.x, bullet.y, bullet.rotation)))
+      })
       this.enemyPlayers.forEach((player) => {
-         const currentPlayer = enemies.find(enemy => enemy.gamerName === player.name);
-         if(currentPlayer) {
-            player.setPosition(currentPlayer.X*1, currentPlayer.Y*1)
+         const currentPlayer = enemies.find(enemy => enemy.id === player.id);
+         if(currentPlayer && currentPlayer.id != this.server.gamer.id) {
+            player.setPosition(currentPlayer.x*1, currentPlayer.x*1)
+         } else {
+            const newEnemy = this.physics.add.existing(new Player(this, player.x*1, player.x*1, player.gamerName, player.id))
+            newEnemy.setGravityY(-800);
+            this.enemyPlayers.push(newEnemy);
          }
       })
       /*this.weapons.setPosition((weapon) => {
@@ -232,23 +252,31 @@ export default class MainScene extends Phaser.Scene {
    }
 
 
-   async updateScene() {
+   async updateScene(playerHit = null) {
       //const updatedScene = this.server.updateScene(this.myBullets, this.player.body.position.x, this.player.body.position.y, this.weapons);
-      const updatedScene = await this.server.tempUpdate(this.player.body.center.x, this.player.body.center.y);
-      if (updatedScene) {
-         //this.weapons = updatedScene.weapons;
-         //this.allBullets = updatedScene.bullets;
-         this.renderScene(updatedScene);
+      await this.server.updateScene({myBullets: this.myBullets, player: this.player, playerHit: playerHit});
+   }
+
+   async getScene() {
+      const scene = await this.server.getScene();
+      if (scene) {
+         if (scene.gamers.find((gamer) => gamer.id === this.server.gamer.id))
+            this.renderScene(scene.gamers)
+         else {
+            this.player.dying();
+            this.player.respawn();
+         }
       }
    }
 
 
-   update(time = 16, delta = 60) {
+   update(time, delta) {
       this.player.update();
       this.followBG();
       this.takeGuns();
       this.fire(this.player);
       this.MyBulletsTraectory();
       this.updateScene();
+      this.getScene();
    }
 }
