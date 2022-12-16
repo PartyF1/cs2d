@@ -35,7 +35,7 @@ export default class Server {
       },
       body: JSON.stringify(params)
     })
-    const answer = await responce.json();
+    const answer = await responce?.json();
     return answer?.result === "ok" ? answer.data : null;
   }
 

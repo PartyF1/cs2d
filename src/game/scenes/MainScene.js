@@ -4,7 +4,7 @@ import Player from "../entities/player.js"
 import Pistol from "../entities/weapons/pistol.js";
 import Cat from "../entities/characters/Cat"
 
-
+let gameStatus = "create";
 
 
 export default class MainScene extends Phaser.Scene {
@@ -21,6 +21,7 @@ export default class MainScene extends Phaser.Scene {
 
       this.centWidth = window.outerWidth / 2;
       this.centHeight = window.outerHeight / 2;
+      this.a = true;
    }
 
    async loadTextures() {
@@ -135,8 +136,6 @@ export default class MainScene extends Phaser.Scene {
          this.mouse, 
          this.myBullets
       ))
-      this.updateScene();
-
       this.physics.add.collider(this.player, this.platform);
       this.physics.add.collider(this.player, this.ground);
       this.weapons.forEach(weapon => {
@@ -146,6 +145,10 @@ export default class MainScene extends Phaser.Scene {
 
       this.camera = this.cameras.main.startFollow(this.player);
       this.scene.launch("ui", { player: this.player })
+      this.updateScene();
+      setTimeout(()=> {
+         this.getScene();   
+      }, 3000);
    }
 
 
@@ -206,7 +209,6 @@ export default class MainScene extends Phaser.Scene {
    //Взятие игроком оружия
    takeGun(gun, index, player) {
       if (player.body.hitTest(gun.x, gun.y) && this.coursor.action.isDown && player.action) {
-         console.log(player.action)
          if (player.haveWeapon) {
             const tempWeapon = player.weapon;
             tempWeapon.setGravityY(0);
@@ -228,24 +230,69 @@ export default class MainScene extends Phaser.Scene {
       })
    }
 
-   renderScene(enemies, bullets) {
-      /*this.allBullets.forEach((bullet) => {
-         bullet.setPosition(bullet.x, bullet.y)
-      })*/
-      this.allBullets = [];
-      bullets.forEach((bullet) => {
-         this.allBullets.push(this.physics.add.existing(new Bullet(this, bullet.x, bullet.y, bullet.rotation)))
-      })
-      this.enemyPlayers.forEach((player) => {
-         const currentPlayer = enemies.find(enemy => enemy.id === player.id);
-         if(currentPlayer && currentPlayer.id != this.server.gamer.id) {
-            player.setPosition(currentPlayer.x*1, currentPlayer.x*1)
-         } else {
-            const newEnemy = this.physics.add.existing(new Player(this, player.x*1, player.x*1, player.gamerName, player.id))
+   updateBullets(bullets) {
+      if(bullets) {    
+         bullets.forEach(bullet=> {
+            if (bullet.gamerId != this.player.id) {
+               const find = this.allBullets.find(oldBullet=>oldBullet.id === bullet.id)
+               if (find) {
+                  this.allBullets.find(oldBullet=>oldBullet.id === bullet.id).setPosition(bullet.x*1, bullet.y*1)
+               } else  {
+                  this.allBullets.push(this.physics.add.existing(new Bullet(this, bullet.x*1, bullet.y*1, bullet.rotation, null, null, bullet.id)).setGravityY(-800));   
+               };
+            }
+         })
+         this.allBullets.forEach((bullet, index)=> {
+            const find = bullets.find(newBullet=>newBullet.id = bullet.id)
+            if(!find) {
+               bullet.destroy();
+               this.allBullets.splice(index, 1);
+            }
+         })
+      }
+   }
+
+   updateEnemies(enemies) {
+      if(enemies) {
+         this.enemyPlayers.forEach((player, index)=> {
+            const find = enemies.find(enemy=>enemy.id === player.id);
+            if(find?.id != this.player.id) {
+               player.setPosition(find.X*1, find.Y*1);
+            } else {
+               player.destroy();
+               this.enemyPlayers.splice(index, 1);
+            }
+         })
+         enemies.forEach(enemy => {
+            const find = this.enemyPlayers.find(player=>player.id);
+            if (!find) {
+               if (enemy.id != this.player.id) {
+                  const newEnemy = this.physics.add.existing(new Player(this, enemy.X*1, enemy.Y*1, enemy.gamerName, enemy.id))
+                  newEnemy.setGravityY(-800);
+                  this.enemyPlayers.push(newEnemy);
+               };    
+            }
+         })
+      }   
+   }
+
+   createEnemies(enemies) {
+      enemies.forEach(enemy => {
+         if (enemy.id != this.player.id) {
+            const newEnemy = this.physics.add.existing(new Player(this, enemy.X*1, enemy.Y*1, enemy.gamerName, enemy.id))
             newEnemy.setGravityY(-800);
             this.enemyPlayers.push(newEnemy);
-         }
-      })
+         };    
+      });
+   }
+
+   renderScene(enemies, bullets) {
+      if (this.a) {
+         this.createEnemies(enemies);
+      } else {
+         this.updateBullets(bullets);
+         this.updateEnemies(enemies)
+      }
       /*this.weapons.setPosition((weapon) => {
          weapon.setPosition(weapon.x, weapon.y)
       })*/
@@ -254,19 +301,20 @@ export default class MainScene extends Phaser.Scene {
 
    async updateScene(playerHit = null) {
       //const updatedScene = this.server.updateScene(this.myBullets, this.player.body.position.x, this.player.body.position.y, this.weapons);
-      await this.server.updateScene({myBullets: this.myBullets, player: this.player, playerHit: playerHit});
+      await this.server.updateScene({bullets: this.myBullets, player: this.player, playerHit: playerHit, weapon: this.player.weapon});
    }
 
    async getScene() {
       const scene = await this.server.getScene();
       if (scene) {
          if (scene.gamers.find((gamer) => gamer.id === this.server.gamer.id))
-            this.renderScene(scene.gamers)
+            this.renderScene(scene.gamers, scene.bullets)
          else {
             this.player.dying();
             this.player.respawn();
          }
       }
+      this.a = false;
    }
 
 
