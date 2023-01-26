@@ -35,8 +35,8 @@ export default class Server {
       },
       body: JSON.stringify(params)
     })
-    const answer = await responce?.json();
-    return answer?.result === "ok" ? answer.data : null;
+    //const answer = await responce?.json();
+    //return answer?.result === "ok" ? answer.data : null;
   }
 
   async login(login, password) {
@@ -110,6 +110,10 @@ export default class Server {
 
   async updateScene(params) {
     return await this.postSend({method: "updateScene", ...params })
+  }
+
+  async leaveMatch() {
+    return await this.send({method: "leaveMatch"})
   }
 
   async tempUpdate(X, Y) {

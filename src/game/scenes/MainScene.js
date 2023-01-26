@@ -4,8 +4,6 @@ import Player from "../entities/player.js"
 import Pistol from "../entities/weapons/pistol.js";
 import Cat from "../entities/characters/Cat"
 
-let gameStatus = "create";
-
 
 export default class MainScene extends Phaser.Scene {
    constructor(server) {
@@ -127,13 +125,13 @@ export default class MainScene extends Phaser.Scene {
          repeat: -1
       });
       this.player = this.physics.add.existing(new Player(
-         this, 
-         this.centWidth - 300, 
-         this.centHeight, 
-         this.server.gamer.gamerName, 
-         this.server.gamer.id, 
-         this.coursor, 
-         this.mouse, 
+         this,
+         this.centWidth - 300,
+         this.centHeight,
+         this.server.gamer.gamerName,
+         this.server.gamer.id,
+         this.coursor,
+         this.mouse,
          this.myBullets
       ))
       this.physics.add.collider(this.player, this.platform);
@@ -145,21 +143,17 @@ export default class MainScene extends Phaser.Scene {
 
       this.camera = this.cameras.main.startFollow(this.player);
       this.scene.launch("ui", { player: this.player })
-      this.updateScene();
-      setTimeout(()=> {
-         this.getScene();   
-      }, 3000);
    }
 
 
    //изменение пули в пространстве, либо её уничтожение при наборе предельной дальности
    setBallistic(bullet, index) {
       if ((bullet.dist > bullet.maxDist) || !bullet.body.touching.none) {
-         this.enemyPlayers.forEach((player, index) => {       
-            if(player.body.hitTest(bullet.body.x, bullet.body.y)){
+         this.enemyPlayers.forEach((player, index) => {
+            if (this.hitTest(player, bullet)) {
                this.updateScene(player.id)
                player.destroy();
-               this.enemyPlayers.splice(index, 1);          
+               this.enemyPlayers.splice(index,1);
             }
          })
          bullet.destroy();
@@ -169,6 +163,26 @@ export default class MainScene extends Phaser.Scene {
          bullet.dist += 1;
       }
    }
+
+   hitTest(object1,object2){
+      var left1 = parseInt(object1.body.x);
+      var left2 = parseInt(object2.body.x);
+      var top1 = parseInt(object1.body.y);
+      var top2 = parseInt(object2.body.y);
+      var width1 = parseInt(object1.width);
+      var width2 = parseInt(object2.width);
+      var height1 = parseInt(object1.height);
+      var height2 = parseInt(object2.height);
+      var horTest = false;
+      var verTest = false;
+      if (((left1 >= left2)&&(left1 <= left2 + width2))||((left2 >= left1)&&(left2 <= left1 + width1))){ horTest = true; } if (((top1 >= top2)&&(top1 <= top2 + height2))||((top2 >= top1)&&(top2 <= top1 + height1))){
+      verTest = true;
+      }
+      if(horTest&&verTest){
+      return true;
+      }
+      return false;
+      }
 
 
 
@@ -231,68 +245,57 @@ export default class MainScene extends Phaser.Scene {
    }
 
    updateBullets(bullets) {
-      if(bullets) {    
-         bullets.forEach(bullet=> {
+      if (bullets?.length) {
+         bullets.forEach(bullet => {
             if (bullet.gamerId != this.player.id) {
-               const find = this.allBullets.find(oldBullet=>oldBullet.id === bullet.id)
-               if (find) {
-                  this.allBullets.find(oldBullet=>oldBullet.id === bullet.id).setPosition(bullet.x*1, bullet.y*1)
-               } else  {
-                  this.allBullets.push(this.physics.add.existing(new Bullet(this, bullet.x*1, bullet.y*1, bullet.rotation, null, null, bullet.id)).setGravityY(-800));   
+               const bull = this.allBullets.find(oldBullet => oldBullet.id === bullet.id)
+               if (bull) {
+                  bull.setPosition(bullet.x - 0, bullet.y - 0)
+               } else {
+                  this.allBullets.push(this.physics.add.existing(new Bullet(this, bullet.x - 0, bullet.y - 0, bullet.rotation, null, null, bullet.id)).setGravityY(-800));
                };
-            }
-         })
-         this.allBullets.forEach((bullet, index)=> {
-            const find = bullets.find(newBullet=>newBullet.id = bullet.id)
-            if(!find) {
-               bullet.destroy();
-               this.allBullets.splice(index, 1);
-            }
-         })
-      }
+            };
+         });
+      }  
+      this.allBullets.forEach((bullet, index)=> {
+         const find = bullets.find(newBullet=>newBullet.id = bullet.id)
+         if(!find) {
+            bullet.destroy();
+            this.allBullets.splice(index, 1);
+         }
+      })
    }
 
    updateEnemies(enemies) {
-      if(enemies) {
-         this.enemyPlayers.forEach((player, index)=> {
-            const find = enemies.find(enemy=>enemy.id === player.id);
-            if(find?.id != this.player.id) {
-               player.setPosition(find.X*1, find.Y*1);
-            } else {
-               player.destroy();
-               this.enemyPlayers.splice(index, 1);
-            }
-         })
-         enemies.forEach(enemy => {
-            const find = this.enemyPlayers.find(player=>player.id);
-            if (!find) {
-               if (enemy.id != this.player.id) {
-                  const newEnemy = this.physics.add.existing(new Player(this, enemy.X*1, enemy.Y*1, enemy.gamerName, enemy.id))
-                  newEnemy.setGravityY(-800);
-                  this.enemyPlayers.push(newEnemy);
-               };    
-            }
-         })
-      }   
-   }
-
-   createEnemies(enemies) {
-      enemies.forEach(enemy => {
-         if (enemy.id != this.player.id) {
-            const newEnemy = this.physics.add.existing(new Player(this, enemy.X*1, enemy.Y*1, enemy.gamerName, enemy.id))
-            newEnemy.setGravityY(-800);
-            this.enemyPlayers.push(newEnemy);
-         };    
-      });
+      if (enemies) {
+         if(enemies.find(enemy=>enemy.id === this.player.id).statusInMatch-0 === 1) {
+            this.enemyPlayers.forEach((player, index) => {
+               const find = enemies.find(enemy => enemy.id === player.id);
+               if (find) {
+                  player.setPosition(find.X - 0, find.Y - 0);
+                  player.setVelocity(0, 0);
+               } else {
+                  player.destroy();
+                  this.enemyPlayers.splice(index,1);
+               }
+            })
+            enemies.forEach(enemy => {
+               const find = this.enemyPlayers.find(player => player.id);
+               if (!find) {
+                  if (enemy.id != this.player.id && enemy.statusInMatch !== 1) {
+                     const newEnemy = this.physics.add.existing(new Player(this, enemy.X -0, enemy.Y -0, enemy.gamerName, enemy.id))
+                     newEnemy.setGravityY(-800);
+                     this.enemyPlayers.push(newEnemy);
+                  };
+               }
+            })
+         }
+      }
    }
 
    renderScene(enemies, bullets) {
-      if (this.a) {
-         this.createEnemies(enemies);
-      } else {
          this.updateBullets(bullets);
          this.updateEnemies(enemies)
-      }
       /*this.weapons.setPosition((weapon) => {
          weapon.setPosition(weapon.x, weapon.y)
       })*/
@@ -301,7 +304,7 @@ export default class MainScene extends Phaser.Scene {
 
    async updateScene(playerHit = null) {
       //const updatedScene = this.server.updateScene(this.myBullets, this.player.body.position.x, this.player.body.position.y, this.weapons);
-      await this.server.updateScene({bullets: this.myBullets, player: this.player, playerHit: playerHit, weapon: this.player.weapon});
+      await this.server.updateScene({ bullets: this.myBullets, player: this.player, playerHit: playerHit, weapon: this.player.weapon, statusInMatch: this.player.state });
    }
 
    async getScene() {
@@ -311,20 +314,20 @@ export default class MainScene extends Phaser.Scene {
             this.renderScene(scene.gamers, scene.bullets)
          else {
             this.player.dying();
-            this.player.respawn();
          }
       }
-      this.a = false;
    }
 
 
    update(time, delta) {
-      this.player.update();
-      this.followBG();
-      this.takeGuns();
-      this.fire(this.player);
-      this.MyBulletsTraectory();
-      this.updateScene();
-      this.getScene();
+      if(this.player.state === 1) {
+         this.player.update();
+         this.followBG();
+         this.takeGuns();
+         this.fire(this.player);
+         this.MyBulletsTraectory();
+         this.updateScene();
+         this.getScene();
+      } 
    }
 }

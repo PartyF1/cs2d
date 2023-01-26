@@ -6,10 +6,11 @@ export default function GamePage(props) {
 
     let game = new Game(server, gamer);
 
-    function exitGame() {
+    async function exitGame() {
         game.destroy(true, false);
         game = null;
         server.gamer = null;
+        await server.leaveMatch();
         setPage("Menu")
     }
 

@@ -6,7 +6,7 @@ export default class Game{
    constructor(server, gamer) {   
       this.gamer = server.gamer;
       this.config = {
-         type: Phaser.AUTO,
+         type: Phaser.CANVAS,
          width: window.innerWidth,
          height: window.innerHeight,
          parent: "game",

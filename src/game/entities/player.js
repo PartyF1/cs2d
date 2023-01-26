@@ -23,7 +23,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.weapon = null;
         this.action = 2;
         this.scene.physics.add.collider(this, scene.ground)
-        this.state = "alive";
+        this.state = 1;
         /*  В дальнейшем всё дерьмо можно будет переписать всё сюда, просто делая это через this.scene,
             в том числе выстрел, который не получилось сделать ранее(личное напоминание).
             Тогда она будет работать не как хуйня и даст намного более широкие возможности унификации,
@@ -111,16 +111,18 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     dying() {
-        this.state = "died";
-        this.kill();   
+        this.setActive(0);
+        this.state = 0;       
+        setTimeout(()=> {
+            this.respawn();
+        }, 5000)
     }
 
-    respawn() {
-        setTimeout(()=> {
-            this.scene.add.existing(this);
-            this.state = "alive";
-            this.setRandomPosition(800, 400, 200, 100);
-        }, 3000)
+    respawn() {     
+        this.setActive(1);   
+        this.state = 1; 
+        this.setX(window.outerWidth / 2);
+        this.setY(window.outerHeight / 2 -100);   
     }
 
 
