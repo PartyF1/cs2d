@@ -1,5 +1,4 @@
 
-
 export default class Server {
   constructor() {
     this.token = null;
@@ -18,7 +17,7 @@ export default class Server {
       .map((key) => `${key}=${params[key]}`)
       .join('&');
     const result = await fetch(`http://cs2d?${query}`);
-    const answer = await result.json();
+    const answer = await result?.json();
     return answer.result === 'ok' ? answer.data : null;
   }
 
@@ -43,7 +42,6 @@ export default class Server {
     if (login && password) {
       const data = await this.send({ method: 'login', login, password });
       this.token = data.token;
-      await this.send({ method: "setGamer" })
       delete data.token;
       return data;
     }
@@ -106,6 +104,7 @@ export default class Server {
       this.sceneHash = scene.sceneHash;
       return scene;
     }
+    return false;
   }
 
   async updateScene(params) {

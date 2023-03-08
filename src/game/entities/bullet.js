@@ -6,7 +6,7 @@ export default class Bullet extends Phaser.Physics.Arcade.Sprite {
         this.id = id;
         this.player = player;
         this.rotation = rotation;
-        this.name = Math.floor(Math.random()*10000)+1;
+        this.uniqId = Math.floor(Math.random()*10000)+1;
         this.scale = 0.05;
         if (this.player) {
             this.mouse = mouse;
