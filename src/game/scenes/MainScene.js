@@ -21,7 +21,6 @@ export default class MainScene extends Phaser.Scene {
 
       this.centWidth = window.outerWidth / 2;
       this.centHeight = window.outerHeight / 2;
-      this.a = true;
    }
 
    async loadTextures() {
