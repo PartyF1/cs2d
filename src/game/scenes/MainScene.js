@@ -18,6 +18,8 @@ export default class MainScene extends Phaser.Scene {
       this.bulletsToFetch = [];
       this.weapons = [];
       this.staticObjects = [];
+      this.invulnerabilityAfterSpawn = false;
+
 
       this.centWidth = window.outerWidth / 2;
       this.centHeight = window.outerHeight / 2;
@@ -141,7 +143,6 @@ export default class MainScene extends Phaser.Scene {
          this.physics.add.collider(weapon, this.platform);
          this.physics.add.collider(weapon, this.ground);
       })
-
       this.camera = this.cameras.main.startFollow(this.player);
       this.scene.launch("ui", { player: this.player })
    }
@@ -151,18 +152,11 @@ export default class MainScene extends Phaser.Scene {
    setBallistic(bullet, index) {
       if ((bullet.dist > bullet.maxDist) || !bullet.body.touching.none) {
          this.bulletsToFetch[index].status = "destroy";
-         this.enemyPlayers.forEach((player, index) => {
-            if (this.hitTest(player, bullet)) {          
-               this.updateScene(this.bulletsToFetch, this.player, player.id);
-               player.destroy();
-               this.enemyPlayers.splice(index, 1);
-            }
-         })
          this.updateScene(this.bulletsToFetch, this.player);
          this.bulletsToFetch.splice(index, 1);
          bullet.destroy();
          this.myBullets.splice(index, 1);
-      } else {     
+      } else {
          this.bulletsToFetch[index].x = bullet.body.x;
          this.bulletsToFetch[index].y = bullet.body.y;
          this.updateScene(this.bulletsToFetch, this.player)
@@ -175,7 +169,7 @@ export default class MainScene extends Phaser.Scene {
       var left2 = parseInt(object2.body.x);
       var top1 = parseInt(object1.body.y);
       var top2 = parseInt(object2.body.y);
-      var width1 = parseInt(object1.width);
+      var width1 = parseInt(object1.width + 2);
       var width2 = parseInt(object2.width);
       var height1 = parseInt(object1.height);
       var height2 = parseInt(object2.height);
@@ -205,21 +199,41 @@ export default class MainScene extends Phaser.Scene {
       this.bg.setPosition(this.player.body.x, this.player.body.y);
    }
 
+   //Попадание
+   hit(object, objectArray, bullet) {
+      const bulletIndex = this.myBullets.indexOf(bullet);
+      const objectIndex = objectArray.indexOf(object);
+      this.bulletsToFetch[bulletIndex].status = "destroy";
+      this.updateScene(this.bulletsToFetch, this.player, object.id);
+      object.destroy();
+      objectArray.splice(objectIndex, 1);
+      this.myBullets.splice(bulletIndex, 1);
+      this.bulletsToFetch.splice(bulletIndex, 1);
+   }
+
    //регистрация выстрела для всех указанного игрока
    fire(player) {
       if (player.mouse.leftButtonDown() && player.haveWeapon && player.weapon?.canShot && player.weapon.ammo) {
          const bullet = this.physics.add.existing(new Bullet(this, player.body.center.x, player.body.center.y, null, player, this.mouse));
          const bulletToFetch = new BulletToFetch(bullet.x, bullet.y, bullet.rotation, bullet.uniqId)
          bullet.playerId = this.player.id;
-         this.physics.add.collider(bullet, this.platform);
-         this.physics.add.collider(bullet, this.ground);
-         this.enemyPlayers.forEach((enemy) => {
-            this.physics.add.collider(enemy, bullet);
-         })
-         bullet.body.setVelocity(bullet.xs, bullet.ys);
-         bullet.body.setGravityY(-800);
          this.myBullets.push(bullet);
          this.bulletsToFetch.push(bulletToFetch);
+         this.physics.add.collider(bullet, this.platform);
+         this.physics.add.collider(bullet, this.ground);
+         this.physics.add.collider(bullet, this.enemyPlayers, (bullet, enemy) => {
+            const enemyIndex = this.enemyPlayers.indexOf(enemy);
+            const bulletIndex = this.myBullets.indexOf(bullet);
+            this.bulletsToFetch[bulletIndex].status = "destroy";
+            this.updateScene(this.bulletsToFetch, this.player, enemy.id);
+            enemy.destroy();
+            this.enemyPlayers.splice(enemyIndex, 1);
+            bullet.destroy();
+            this.myBullets.splice(bulletIndex, 1);
+            this.bulletsToFetch.splice(bulletIndex, 1);
+         });
+         bullet.body.setVelocity(bullet.xs, bullet.ys);
+         bullet.body.setGravityY(-800);
          this.updateScene(this.bulletsToFetch, this.player);
          bulletToFetch.status = "fly";
          this.sound.play("pistolShot");
@@ -280,7 +294,7 @@ export default class MainScene extends Phaser.Scene {
 
    updateEnemies(enemies) {
       if (enemies) {
-         if (enemies.find(enemy => enemy.id === this.player.id)?.statusInMatch - 0 === 1) {
+         if (enemies.find(enemy => enemy.id === this.player.id)?.statusInMatch === 'alive') {
             this.enemyPlayers.forEach((player, index) => {
                const find = enemies.find(enemy => enemy.id === player.id);
                if (find) {
@@ -294,7 +308,7 @@ export default class MainScene extends Phaser.Scene {
             enemies.forEach(enemy => {
                const find = this.enemyPlayers.find(player => player.id);
                if (!find) {
-                  if (enemy.id != this.player.id && enemy.statusInMatch !== 1) {
+                  if (enemy.id != this.player.id && enemy.statusInMatch === "alive") {
                      const newEnemy = this.physics.add.existing(new Player(this, enemy.X - 0, enemy.Y - 0, enemy.gamerName, enemy.id))
                      newEnemy.setGravityY(-800);
                      this.enemyPlayers.push(newEnemy);
@@ -321,23 +335,47 @@ export default class MainScene extends Phaser.Scene {
 
    async getScene() {
       const scene = await this.server.getScene();
-      if (scene) {
-         this.renderScene(scene.gamers, scene.bullets)
-         if (!scene.gamers.find((gamer) => gamer.id === this.server.gamer.id))
-            this.player.dying();
+      try {
+         if (scene) {
+            this.renderScene(scene.gamers, scene.bullets);
+            if (scene.gamers && !scene.gamers?.find((gamer) => gamer.id === this.server.gamer.id)) {
+               this.dying();
+            }
+         }
+      } catch (e) {
       }
+   }
+
+   async dying() {
+      if (this.player.state == "alive") {
+         this.player.state = "dead";
+         this.updateScene(null, this.player);
+         this.player.setActive(0);
+         setTimeout(() => {
+            this.respawn();
+         }, 5000)
+      }
+   }
+
+   async respawn() {
+      this.player.setX(window.outerWidth / 2);
+      this.player.setY(window.outerHeight / 2 - 100);
+      this.player.setActive(1);
+      this.player.state = "respawn";
+      this.updateScene(null, this.player); 
+      this.player.state = "alive";
    }
 
 
    update(time, delta) {
-      if (this.player.active) {
+      if (this.player.state == 'alive') {
          this.player.update();
          this.updateScene(null, this.player);
+         this.getScene();
       }
       this.followBG();
       this.takeGuns();
       this.fire(this.player);
-      this.MyBulletsTraectory();
-      this.getScene();
+      this.MyBulletsTraectory();     
    }
 }
