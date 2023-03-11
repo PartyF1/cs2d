@@ -4,7 +4,7 @@ import "./GamePage.css"
 export default function GamePage(props) {
     const { server, setPage, gamer } = props;
 
-    let game = new Game(server, gamer);
+    let game = new Game(server, gamer, setPage);
 
     async function exitGame() {
         game.destroy(true, false);

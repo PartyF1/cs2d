@@ -7,7 +7,7 @@ import Cat from "../entities/characters/Cat"
 
 
 export default class MainScene extends Phaser.Scene {
-   constructor(server) {
+   constructor(server, setPage) {
       super({ key: "mainScene" });
 
       this.server = server;
@@ -20,11 +20,13 @@ export default class MainScene extends Phaser.Scene {
       this.staticObjects = [];
       this.worldCenterY = 0
       this.worldCenterX = 0
+      this.setPage = setPage;
 
 
       this.centWidth = window.outerWidth / 2;
       this.centHeight = window.outerHeight / 2;
    }
+
 
    async loadTextures() {
       const textures = await this.server.getTextures();
@@ -371,11 +373,16 @@ export default class MainScene extends Phaser.Scene {
    async getScene() {
       const scene = await this.server.getScene();
       try {
-         if (scene) {
+         if (scene?.status != "finish") {
             this.renderScene(scene.gamers, scene.bullets);
             if (scene.gamers && scene.gamers.find((gamer) => gamer.id === this.server.gamer.id).statusInMatch == "dead") {
                this.dying();
             }
+         }
+         else {
+            this.server.leaveMatch();
+            this.setPage("Menu");
+            this.game.destroy(true, false);
          }
       } catch (e) {
       }

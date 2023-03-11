@@ -3,7 +3,7 @@ import MainScene from "./scenes/MainScene";
 import UI from "./scenes/UI";
 
 export default class Game{ 
-   constructor(server, gamer) {   
+   constructor(server, gamer, setPage) {   
       this.gamer = server.gamer;
       this.config = {
          type: Phaser.CANVAS,
@@ -16,7 +16,7 @@ export default class Game{
                gravity: { y: 800 },
             }
          },
-         scene: [new MainScene(server), new UI()]
+         scene: [new MainScene(server, setPage), new UI()]
          
       }  
       this.game = null 
