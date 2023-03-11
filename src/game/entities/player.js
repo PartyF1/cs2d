@@ -13,6 +13,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.id = id;
         this.coursor = coursor;
         this.mouse = mouse;
+        this.count = 0;
         //---------------------
         this.canJump = true;
         this.bullets = bullets;
@@ -22,7 +23,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.vector = null;
         this.weapon = null;
         this.action = 2;
-        this.scene.physics.add.collider(this, scene.ground)
         this.state = "alive"; // "alive", "dead", "respawn"//
         /*  В дальнейшем всё дерьмо можно будет переписать всё сюда, просто делая это через this.scene,
             в том числе выстрел, который не получилось сделать ранее(личное напоминание).
@@ -42,6 +42,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     //одиночный прыжок
     jump() {
+        console.log(this.count, this.canJump)
         if (this.count < 2 && this.canJump) {
             this.setVelocityY(-500);
             this.count++;

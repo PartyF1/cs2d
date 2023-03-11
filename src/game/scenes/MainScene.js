@@ -4,7 +4,6 @@ import Player from "../entities/player.js"
 import Pistol from "../entities/weapons/pistol.js";
 import BulletToFetch from "../entities/bulletToFetch.js";
 import Cat from "../entities/characters/Cat"
-import { wait } from "@testing-library/user-event/dist/utils/index.js";
 
 
 export default class MainScene extends Phaser.Scene {
@@ -19,7 +18,8 @@ export default class MainScene extends Phaser.Scene {
       this.bulletsToFetch = [];
       this.weapons = [];
       this.staticObjects = [];
-      this.invulnerabilityAfterSpawn = false;
+      this.worldCenterY = 0
+      this.worldCenterX = 0
 
 
       this.centWidth = window.outerWidth / 2;
@@ -87,21 +87,32 @@ export default class MainScene extends Phaser.Scene {
       this.load.audio("pistolShot", "audio/sound/pistol.mp3");
       this.load.spritesheet("catStay", "assets/catStay.png", { frameWidth: 18, frameHeight: 27 })
       this.load.spritesheet("catRun", "assets/catRun.png", { frameWidth: 20, frameHeight: 27 })
+      this.load.image("tiles", "assets/industrial.v1.png");
+      this.load.tilemapTiledJSON("map", "assets/Map.json")
    }
 
    create() {
       this.bg = this.add.tileSprite(this.centWidth, this.centHeight, 4000, 2250, "city").setScale(this.centWidth / 2000, this.centHeight / 1125);
 
-      this.weapons.push(this.physics.add.existing(new Pistol(this, this.centWidth, this.centHeight)))
-      this.weapons.push(this.physics.add.existing(new Pistol(this, this.centWidth + 100, this.centHeight)))
-      this.weapons.push(this.physics.add.existing(new Pistol(this, this.centWidth - 100, this.centHeight)))
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX, this.worldCenterX)))
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX + 100,  this.worldCenterY )))
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX - 100,  this.worldCenterY )))
+
+      this.map = this.make.tilemap({key: "map"});
+      this.tileset = this.map.addTilesetImage("industrial.v1", "tiles");
+
+      const walls = this.map.createLayer("Map", this.tileset);
+      const background = this.map.createLayer("Background", this.tileset);
+      walls.setCollisionByProperty({collides: true})
 
 
-      this.ground = this.physics.add.staticGroup()
-      this.ground.create(this.centWidth, this.centHeight + 300, "ground");
+      this.staticObjects.push(walls);
 
-      this.platform = this.physics.add.staticGroup();
-      this.platform.create(this.centWidth, this.centHeight, "platform");
+
+      /*this.staticObjects.push(this.physics.add.staticGroup().create(this.worldCenterX, this.worldCenterY + 300, "ground"));
+      this.staticObjects.push(this.physics.add.staticGroup().create(this.worldCenterX, this.worldCenterY, "platform"));*/
+
+
 
       this.coursor = this.input.keyboard.addKeys(
          {
@@ -130,20 +141,18 @@ export default class MainScene extends Phaser.Scene {
       });
       this.player = this.physics.add.existing(new Player(
          this,
-         this.centWidth - 300,
-         this.centHeight,
+         this.worldCenterX,
+         this.worldCenterY,
          this.server.gamer.gamerName,
          this.server.gamer.id,
          this.coursor,
          this.mouse,
          this.myBullets
       ))
-      this.physics.add.collider(this.player, this.platform);
-      this.physics.add.collider(this.player, this.ground);
-      this.weapons.forEach(weapon => {
-         this.physics.add.collider(weapon, this.platform);
-         this.physics.add.collider(weapon, this.ground);
-      })
+      this.physics.add.collider(this.player, walls, ()=> {
+         this.player.count = 0;
+      });
+      this.physics.add.collider(this.weapons, walls);
       this.camera = this.cameras.main.startFollow(this.player);
       this.scene.launch("ui", { player: this.player })
    }
@@ -151,17 +160,17 @@ export default class MainScene extends Phaser.Scene {
 
    //изменение пули в пространстве, либо её уничтожение при наборе предельной дальности
    setBallistic(bullet, index) {
-      if ((bullet.dist > bullet.maxDist) || !bullet.body.touching.none) {
-         this.bulletsToFetch[index].status = "destroy";
-         this.updateScene(this.bulletsToFetch, this.player);
-         this.bulletsToFetch.splice(index, 1);
-         bullet.destroy();
-         this.myBullets.splice(index, 1);
-      } else {
+      if (bullet.dist < bullet.maxDist) {
          this.bulletsToFetch[index].x = bullet.body.x;
          this.bulletsToFetch[index].y = bullet.body.y;
          this.updateScene(this.bulletsToFetch, this.player)
          bullet.dist += 1;
+      } else {
+         this.bulletsToFetch[index].status = "destroy";
+         this.updateScene(this.bulletsToFetch, this.player);
+         bullet.destroy();
+         this.myBullets.splice(index, 1);
+         this.bulletsToFetch.splice(index, 1);
       }
    }
 
@@ -220,8 +229,14 @@ export default class MainScene extends Phaser.Scene {
          bullet.playerId = this.player.id;
          this.myBullets.push(bullet);
          this.bulletsToFetch.push(bulletToFetch);
-         this.physics.add.collider(bullet, this.platform);
-         this.physics.add.collider(bullet, this.ground);
+         this.physics.add.collider(bullet, this.staticObjects, (bullet) => {
+            const bulletIndex = this.myBullets.indexOf(bullet);
+            this.bulletsToFetch[bulletIndex].status = "destroy";
+            this.updateScene(this.bulletsToFetch, this.player);
+            bullet.destroy();
+            this.myBullets.splice(bulletIndex, 1);
+            this.bulletsToFetch.splice(bulletIndex, 1);
+         });
          this.physics.add.collider(bullet, this.enemyPlayers, (bullet, enemy) => {
             const enemyIndex = this.enemyPlayers.indexOf(enemy);
             const bulletIndex = this.myBullets.indexOf(bullet);
@@ -296,7 +311,7 @@ export default class MainScene extends Phaser.Scene {
    updateEnemies(enemies) {
       if (enemies) {
          this.enemyPlayers.forEach((player, index) => {
-            const newPlayer = enemies.find(enemy=> enemy.id === player.id);
+            const newPlayer = enemies.find(enemy => enemy.id === player.id);
             if (newPlayer) {
                player.setPosition(newPlayer.X - 0, newPlayer.Y - 0);
                player.setVelocity(0, 0);
@@ -308,7 +323,6 @@ export default class MainScene extends Phaser.Scene {
          })
          enemies.forEach(enemy => {
             const find = this.enemyPlayers.find(player => player.id === enemy.id);
-            console.log(enemy.id, find);
             if (!find) {
                if (enemy.id != this.player.id && enemy.statusInMatch === "alive") {
                   const newEnemy = this.physics.add.existing(new Player(this, enemy.X - 0, enemy.Y - 0, enemy.gamerName, enemy.id))
@@ -377,11 +391,11 @@ export default class MainScene extends Phaser.Scene {
    }
 
    async respawn() {
-      this.player.setX(window.outerWidth / 2);
-      this.player.setY(window.outerHeight / 2 - 100);
+      this.player.setX(this.worldCenterX);
+      this.player.setY(this.worldCenterY - 100);
       this.player.setActive(1);
       this.player.state = "respawn";
-      this.updateScene(null, this.player); 
+      this.updateScene(null, this.player);
       this.player.state = "alive";
    }
 
@@ -391,10 +405,10 @@ export default class MainScene extends Phaser.Scene {
          this.player.update();
          this.updateScene(null, this.player);
          this.getScene();
-      } 
+      }
       this.followBG();
       this.takeGuns();
       this.fire(this.player);
-      this.MyBulletsTraectory();     
+      this.MyBulletsTraectory();
    }
 }
