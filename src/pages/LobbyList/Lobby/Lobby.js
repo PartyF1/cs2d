@@ -39,7 +39,7 @@ export default function Lobby(props) {
 
   async function startMatch() {
     const lobby = findThisLobby()
-    await server.startMatch(lobbyId, lobby.ownerId, lobby.amountPlayers, "time", "city");
+    await server.startMatch(lobbyId, lobby.ownerId, lobby.amountPlayers, "kills", "city");
   }
 
   async function deleteLobby() {
