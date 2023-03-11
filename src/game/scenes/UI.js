@@ -25,5 +25,12 @@ export default class UI extends Phaser.Scene {
         game.events.on("shot", (ammo, maxAmmo)=>{
             this.ammo.setText(`${ammo} / ${maxAmmo}`)
         })
+        game.events.on("showStats", (players) => {
+            this.showStats(players);
+        })
+    }
+
+    showStats(player) {
+        
     }
 }

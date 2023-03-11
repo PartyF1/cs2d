@@ -14,7 +14,6 @@ export default class Game{
             default: "arcade",
             arcade: {
                gravity: { y: 800 },
-               debug: true,
             }
          },
          scene: [new MainScene(server), new UI()]
