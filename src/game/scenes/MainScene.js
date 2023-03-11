@@ -4,6 +4,7 @@ import Player from "../entities/player.js"
 import Pistol from "../entities/weapons/pistol.js";
 import BulletToFetch from "../entities/bulletToFetch.js";
 import Cat from "../entities/characters/Cat"
+import { wait } from "@testing-library/user-event/dist/utils/index.js";
 
 
 export default class MainScene extends Phaser.Scene {
@@ -294,16 +295,36 @@ export default class MainScene extends Phaser.Scene {
 
    updateEnemies(enemies) {
       if (enemies) {
-         if (enemies.find(enemy => enemy.id === this.player.id)?.statusInMatch === 'alive') {
+         this.enemyPlayers.forEach((player, index) => {
+            const newPlayer = enemies.find(enemy=> enemy.id === player.id);
+            if (newPlayer) {
+               player.setPosition(newPlayer.X - 0, newPlayer.Y - 0);
+               player.setVelocity(0, 0);
+            }
+            if (newPlayer.statusInMatch == "dead" || newPlayer.statusInMatch === "respawn") {
+               player.destroy();
+               this.enemyPlayers.splice(index, 1);
+            }
+         })
+         enemies.forEach(enemy => {
+            const find = this.enemyPlayers.find(player => player.id === enemy.id);
+            console.log(enemy.id, find);
+            if (!find) {
+               if (enemy.id != this.player.id && enemy.statusInMatch === "alive") {
+                  const newEnemy = this.physics.add.existing(new Player(this, enemy.X - 0, enemy.Y - 0, enemy.gamerName, enemy.id))
+                  newEnemy.setGravityY(-800);
+                  this.enemyPlayers.push(newEnemy);
+               };
+            }
+         })
+         /*if (enemies.find(enemy => enemy.id === this.player.id)?.statusInMatch === 'alive') {
             this.enemyPlayers.forEach((player, index) => {
                const find = enemies.find(enemy => enemy.id === player.id);
                if (find) {
                   player.setPosition(find.X - 0, find.Y - 0);
                   player.setVelocity(0, 0);
-               } else {
-                  player.destroy();
-                  this.enemyPlayers.splice(index, 1);
-               }
+               } 
+               
             })
             enemies.forEach(enemy => {
                const find = this.enemyPlayers.find(player => player.id);
@@ -315,7 +336,7 @@ export default class MainScene extends Phaser.Scene {
                   };
                }
             })
-         }
+         }*/
       }
    }
 
@@ -338,7 +359,7 @@ export default class MainScene extends Phaser.Scene {
       try {
          if (scene) {
             this.renderScene(scene.gamers, scene.bullets);
-            if (scene.gamers && !scene.gamers?.find((gamer) => gamer.id === this.server.gamer.id)) {
+            if (scene.gamers && scene.gamers.find((gamer) => gamer.id === this.server.gamer.id).statusInMatch == "dead") {
                this.dying();
             }
          }
@@ -351,9 +372,7 @@ export default class MainScene extends Phaser.Scene {
          this.player.state = "dead";
          this.updateScene(null, this.player);
          this.player.setActive(0);
-         setTimeout(() => {
-            this.respawn();
-         }, 5000)
+         setTimeout(() => this.respawn(), 5000);
       }
    }
 
@@ -372,7 +391,7 @@ export default class MainScene extends Phaser.Scene {
          this.player.update();
          this.updateScene(null, this.player);
          this.getScene();
-      }
+      } 
       this.followBG();
       this.takeGuns();
       this.fire(this.player);
