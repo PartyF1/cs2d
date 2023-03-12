@@ -27,11 +27,7 @@ export default function Header(props) {
     <div className="menu">
       <div>
         <button className="button" onClick={openLobbyList}>ЛОББИ</button>
-        <button className="button" onClick={gameStart}>ИГРАТЬ</button>
-        <button className="button">ПЕРСОНАЛИЗАЦИЯ</button>
-        <button className="button">НАСТРОЙКИ</button>
         <button className="button" onClick={logout}>ВЫЙТИ</button>
-        <button className="buttonChat" onClick={openChat}></button>
       </div>
       {chatState === 'open' ? <Chat server={server} userData={userData}></Chat> : ''}
     </div>
