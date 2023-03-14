@@ -16,7 +16,7 @@ export default class Server {
     const query = Object.keys(params)
       .map((key) => `${key}=${params[key]}`)
       .join('&');
-    const result = await fetch(`http://cs2d?${query}`);
+    const result = await fetch(`/api/?${query}`);
     const answer = await result?.json();
     return answer.result === 'ok' ? answer.data : null;
   }
@@ -25,7 +25,7 @@ export default class Server {
     if (this.token) {
       params.token = this.token;
     }
-    const responce = await fetch(`http://cs2d?method=${params.method}`, {
+    const responce = await fetch(`/api/?method=${params.method}`, {
       mode: "no-cors",
       method: "POST",
       headers: {

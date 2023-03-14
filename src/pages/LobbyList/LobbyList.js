@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import AccessibleLobby from "./AccessibleLobby"
 import Lobby from "./Lobby/Lobby";
-import "./lobby.css"
+import "./lobbyList.css"
 
 let lobbys = [];
 
 export default function LobbyList(props) {
-  const { server, setPage, userData} = props;
+  const { server, setPage, userData } = props;
   const [state, setState] = useState();
   const [lobbyPageState, setLobbyPageState] = useState("list");
   const [lobbyId, setLobbyId] = useState();
@@ -50,27 +50,29 @@ export default function LobbyList(props) {
 
   return (
     <div>
+      <button className="toMenu" onClick={toMenu}>Главное меню</button>
+      <button className="createLobby" onClick={createLobby}>Создать лобби</button>
       {lobbyPageState === "list" ?
         <div className="lobbyContainer">
           <h2>Список игр</h2>
-          <div className="lobbysField">
-            {lobbys.map((element, index) => {
-              return (<AccessibleLobby key={index} lobby={element} joinToLobby={joinToLobby}></AccessibleLobby>)
-            })}
+          <div className="lobbyList">
+            <div className="lobbysField">
+              {lobbys.map((element, index) => {
+                return (<AccessibleLobby key={index} lobby={element} joinToLobby={joinToLobby}></AccessibleLobby>)
+              })}
+            </div>
           </div>
-          <button onClick={createLobby}>Создать лобби</button>
-          <button onClick={toMenu}>Главное меню</button>
         </div> :
-        lobbyPageState === "lobby" ? 
-        <Lobby server={server} 
-        lobbyId={lobbyId} 
-        setLobbyId={setLobbyId} 
-        setLobbyPageState={setLobbyPageState}
-        userData={userData}
-        lobbys={lobbys}
-        getLobbys={getLobbys}
-        setPage={setPage}
-        /> : ""
+        lobbyPageState === "lobby" ?
+          <Lobby server={server}
+            lobbyId={lobbyId}
+            setLobbyId={setLobbyId}
+            setLobbyPageState={setLobbyPageState}
+            userData={userData}
+            lobbys={lobbys}
+            getLobbys={getLobbys}
+            setPage={setPage}
+          /> : ""
       }
     </div>
 

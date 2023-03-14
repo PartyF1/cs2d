@@ -1,0 +1,73 @@
+@font-face {
+	font-family: 'FontName'; 
+	src: url(/public/12157.ttf); 
+}
+
+ .logo{
+    background-image: url(/public/title.png);
+    background-position: center;
+    width: 52vw;
+    height: 33vw;
+    margin-bottom: 3ch;
+    padding: 15px 30px;
+    display: inline-grid;
+    background-size: 100%;
+  }
+
+  .button{
+    font-family: 'FontName';
+    font-style: Regular;
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: right;
+    padding: 16px 78px 24px;
+    gap: 12px;
+    margin-bottom: 3vh;
+    width: 20vw;
+    height: 8vh;
+    
+    background: #FFDF38;
+    box-shadow: inset 0px -6px 0px #C59A2E;
+    
+    flex: none;
+    order: 0;
+    flex-grow: 0; 
+  }
+  .button:active {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 78px 16px;
+    gap: 10px;
+    background: #F1D22D;
+    box-shadow: inset 0px 6px 0px #C59A2E;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+
+  .button:hover {
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 78px 24px;
+  gap: 10px;
+  background: #FFE55A;
+  box-shadow: inset 0px -6px 0px #C59A2E;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  }
+
+  .startScreen{
+    visibility: visible;
+    align-items: center;
+    justify-content: center;
+    display: inline-grid;
+    width:100%;
+  }

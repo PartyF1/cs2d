@@ -22,7 +22,7 @@ export default function Lobby(props) {
           setState(!state);
         } else {
           server.getGamer();
-          if (server.gamer.id) {
+          if (server.gamer.matchId) {
             startGame();
           } else leaveLobby()
         }
@@ -55,7 +55,7 @@ export default function Lobby(props) {
   }
 
   return (
-    <div>
+    <div className="lobbyContainer">
       <div className='playerList'>список игроков
         {players.map((user, i) => {
           return (

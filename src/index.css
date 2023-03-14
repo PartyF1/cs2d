@@ -1,8 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 body {
+  background-image: url(../public/main-background.png);
   margin: 0;
   font-family: 'Inter', system-ui;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 code {

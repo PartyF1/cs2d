@@ -1,0 +1,88 @@
+.lobbyContainer {
+  display: inline-grid;
+  box-sizing: border-box;
+  width: 1000px;
+  height: 774px;
+  left: 114px;
+  top: 153px;
+  margin-top: 50px;
+
+  /* gray 1 */
+
+  background: #363838;
+  /* gray 2 */
+
+  border: 3px solid #615C5C;
+
+}
+
+.lobbyList {
+  box-sizing: border-box;
+  width: 950px;
+  height: 680px;
+  left: 114px;
+  top: 153px;
+  margin-left: 25px;
+
+  /* gray 1 */
+
+  background: #171717;
+  /* gray 2 */
+
+  border: 3px solid #615C5C;
+  overflow-y: scroll;
+}
+
+.createLobby {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: right;
+  padding: 16px 78px 24px;
+  gap: 10px;
+  background: #FFDF38;
+  box-shadow: inset 0px -6px 0px #C59A2E;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.createLobby:hover {
+  background: #FFE55A;
+  box-shadow: inset 0px -6px 0px #C59A2E;
+}
+
+.createLobby:active {
+  padding: 24px 78px 16px;
+  background: #F1D22D;
+  box-shadow: inset 0px 6px 0px #C59A2E;
+}
+
+.toMenu {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: right;
+  padding: 16px 78px 24px;
+  gap: 10px;
+  background: #ff3838;
+  box-shadow: inset 0px -6px 0px #7e0101;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.toMenu:hover {
+  background: #fd7878;
+  box-shadow: inset 0px -6px 0px #7e0101;
+}
+
+.toMenu:active {
+  padding: 24px 78px 16px;
+  background: #7e0101;
+  box-shadow: inset 0px 6px 0px #ff3838;
+}

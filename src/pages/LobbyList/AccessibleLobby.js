@@ -1,4 +1,5 @@
 import React from "react";
+import "./accessibleLobby.css"
 
 export default function AccessibleLobby(props) {
   const { lobby, joinToLobby } = props;
@@ -8,10 +9,10 @@ export default function AccessibleLobby(props) {
   }
 
   return (
-    <div>
-      <div className="lobbyId">{lobby.id}</div>
-      <div className="playersCount">{lobby.amountPlayers}/{lobby.maxAmountPlayers}</div>
-      <button onClick={join}>Присоединиться</button>
+    <div className="accessibleLobby">
+      LOBBY ID: <div className="lobbyId">{lobby.id}</div>
+      ИГРОКИ: <div className="playersCount">{lobby.amountPlayers}/{lobby.maxAmountPlayers}</div>
+      <button className = "button" onClick={join}>Присоединиться</button>
     </div>
   );
 }
