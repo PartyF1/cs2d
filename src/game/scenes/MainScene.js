@@ -4,6 +4,7 @@ import Player from "../entities/player.js"
 import Pistol from "../entities/weapons/pistol.js";
 import BulletToFetch from "../entities/bulletToFetch.js";
 import Cat from "../entities/characters/Cat"
+import Weapon from "../entities/weapons/weapon.js";
 
 
 export default class MainScene extends Phaser.Scene {
@@ -97,15 +98,15 @@ export default class MainScene extends Phaser.Scene {
       this.bg = this.add.tileSprite(this.centWidth, this.centHeight, 4000, 2250, "city").setScale(this.centWidth / 2000, this.centHeight / 1125);
 
       this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX, this.worldCenterX)))
-      this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX + 100,  this.worldCenterY )))
-      this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX - 100,  this.worldCenterY )))
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX + 100, this.worldCenterY)))
+      this.weapons.push(this.physics.add.existing(new Pistol(this, this.worldCenterX - 100, this.worldCenterY)))
 
-      this.map = this.make.tilemap({key: "map"});
+      this.map = this.make.tilemap({ key: "map" });
       this.tileset = this.map.addTilesetImage("industrial.v1", "tiles");
 
       const walls = this.map.createLayer("Map", this.tileset);
       const background = this.map.createLayer("Background", this.tileset);
-      walls.setCollisionByProperty({collides: true})
+      walls.setCollisionByProperty({ collides: true })
 
 
       this.staticObjects.push(walls);
@@ -151,7 +152,7 @@ export default class MainScene extends Phaser.Scene {
          this.mouse,
          this.myBullets
       ))
-      this.physics.add.collider(this.player, walls, ()=> {
+      this.physics.add.collider(this.player, walls, () => {
          this.player.count = 0;
       });
       this.physics.add.collider(this.weapons, walls);
@@ -370,6 +371,23 @@ export default class MainScene extends Phaser.Scene {
       await this.server.updateScene({ bullets: bulletsToFetch, player: player, playerHit: playerHit, weapon: player.weapon, statusInMatch: player.state });
    }
 
+   async randomItem() {
+      if (this.player.action && this.coursor.action.isDown) {
+         const item = await this.server.randomItem();
+         console.log(item);
+         switch (item) {
+            case "bullet": {
+               new Bullet(this, 0, 0, 0);
+               break;
+            }
+            case "weapon": {
+               new Pistol(this, 0, 0);
+               break;
+            }
+         }
+      }
+   }
+
    async getScene() {
       const scene = await this.server.getScene();
       try {
@@ -410,6 +428,7 @@ export default class MainScene extends Phaser.Scene {
    update(time, delta) {
       if (this.player.state == 'alive') {
          this.player.update();
+         this.randomItem();
          this.updateScene(null, this.player);
          this.getScene();
       }
